@@ -10,7 +10,7 @@ Purpose: functions for calculating crop yield and cost
 # import packages
 import pandas as pd
 import numpy as np
-from Submodel_SWAT.SWAT_functions import basic_landuse, landuse_mat
+from model_SWAT.SWAT_functions import basic_landuse, landuse_mat
 
 df_corn = pd.read_csv(r'C:\ITEEM\Submodel_SWAT\response_matrix_csv\yield_corn.csv')
 df_soybean = pd.read_csv(r'C:\ITEEM\Submodel_SWAT\response_matrix_csv\yield_soybean.csv')

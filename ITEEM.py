@@ -271,10 +271,10 @@ class ITEEM(object):
         return environment, food, economics, energy, output_all
         
 # start = time.time()
-landuse_matrix_baseline = np.zeros((45,62))
-landuse_matrix_baseline[:,55] = 0.25
-landuse_matrix_baseline[:,37] = 0.75
-baseline = ITEEM(landuse_matrix_baseline, tech_wwt='AS', limit_N=10.0, tech_GP1=1, tech_GP2=1, tech_GP3=1)
-output = baseline.run_ITEEM()
+# landuse_matrix_baseline = np.zeros((45,62))
+# landuse_matrix_baseline[:,55] = 0.25
+# landuse_matrix_baseline[:,37] = 0.75
+# baseline = ITEEM(landuse_matrix_baseline, tech_wwt='AS', limit_N=10.0, tech_GP1=1, tech_GP2=1, tech_GP3=1)
+# output = baseline.run_ITEEM()
 # end = time.time()
 # print('Simulation time is: ', end - start)
