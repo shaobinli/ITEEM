@@ -188,12 +188,12 @@ class Grain(object):
 
         if self.tech_GP==1:
             direct_fixed_cost = self.df[self.column][12]  # $/yr
-            depreciation_cost = self.df[self.column][16]  # $/yr
-            # depreciation_cost = direct_fixed_cost*0.0655 # $/yr
+            # depreciation_cost = self.df[self.column][16]  # $/yr
+            depreciation_cost = direct_fixed_cost*0.0655 # $/yr
         elif self.tech_GP==2:
             direct_fixed_cost = self.df[self.column][12] + self.df[self.column][34]  # $/yr
-            depreciation_cost = self.df[self.column][16] + self.df[self.column][38]  # $/yr
-            # depreciation_cost = direct_fixed_cost*0.0655 # $/yr
+            # depreciation_cost = self.df[self.column][16] + self.df[self.column][38]  # $/yr
+            depreciation_cost = direct_fixed_cost*0.0655 # $/yr
         working_capital = direct_fixed_cost*0.05      # assume 5%
         cash_flow_list = [-(direct_fixed_cost*tax+working_capital), -(direct_fixed_cost*(1-tax))]
         for i in depreciation_rate:
@@ -211,50 +211,3 @@ class Grain(object):
 # (Grain(plant_type=1, plant_capacity=2.1, tech_GP=2).get_energy_use()[-1] + \
 #     Grain(plant_type=1, plant_capacity=5.0, tech_GP=2).get_energy_use()[-1] + \
 #         Grain(plant_type=2, plant_capacity=120, tech_GP=2).get_energy_use()[-1])/(10**6)
-
-# Grain(plant_type=1, plant_capacity=2.1, tech_GP=2).get_energy_use()
-# wet_1_base = Grain(plant_type=1, plant_capacity=2.1, tech_GP=1).get_profit(r=0.07, p_credit=0.0)
-# wet_1_rp = Grain(plant_type=1, plant_capacity=2.1, tech_GP=2).get_profit(r=0.07, p_credit=0.0)
-# Grain(plant_type=1, plant_capacity=2.1, tech_GP=2).get_revenue()
-# Grain(plant_type=1, plant_capacity=2.1, tech_GP=2).get_cost()
-# cash_flow_list=Grain(plant_type=1, plant_capacity=2.1, tech_GP=2).get_profit(r=0.07, p_credit=0.0)[1][-1]
-
-# dry_1_base = Grain(plant_type=2, plant_capacity=120, tech_GP=1).get_profit(r=0.07, p_credit=0.0)
-# dry_1_rp = Grain(plant_type=2, plant_capacity=120, tech_GP=2).get_profit(r=0.07, p_credit=0.0)
-# dry_1_rp_revenue = Grain(plant_type=2, plant_capacity=120, tech_GP=2).get_revenue()
-# dry_1_base - dry_1_rp
-
-# annuity_factor(20, 0.07)
-# chem_index = 1.0
-# feedstock_index = 1.0
-# grain_product_index = 1.2
-# utility_index = 1.0
-# rP_index = 1.2
-
-# wet_1.get_revenue(grain_product_index = grain_product_index, rP_index=rP_index)[-1] \
-#     + wet_2.get_revenue(grain_product_index = grain_product_index,rP_index=rP_index)[-1] \
-#         + dry_1.get_revenue(grain_product_index = grain_product_index, rP_index=rP_index)[-1]
-
-# wet_1.get_cost(chem_index=chem_index, feedstock_index=feedstock_index, utility_index=utility_index)[-1] \
-#     + wet_2.get_cost(chem_index=chem_index, feedstock_index=feedstock_index, utility_index=utility_index)[-1] \
-#         + dry_1.get_cost(chem_index=chem_index, feedstock_index=feedstock_index, utility_index=utility_index)[-1]
-
-# wet_1.get_profit(r=0.07, chem_index=chem_index, feedstock_index=feedstock_index, grain_product_index=grain_product_index)[-1] \
-#     + wet_2.get_profit(r=0.07, chem_index=chem_index, feedstock_index=feedstock_index, grain_product_index=grain_product_index)[-1] \
-#         + dry_1.get_profit(r=0.07, chem_index=chem_index, feedstock_index=feedstock_index, grain_product_index=grain_product_index)[-1]
-
-# wet_1.get_cost(chem_index=1.2)
-# wet_1.get_revenue()
-# wet_1_rP = Grain(plant_type=1, plant_capacity=2.1, tech_GP=2, raw_P=1)
-# wet_1.get_revenue()[-1] + wet_2.get_revenue()[-1] + dry_1.get_revenue()[-1]
-# wet_1_rP.get_revenue()[-1]
-# wet_1_base.get_revenue()[-1] - wet_1_base.get_cost()[-1]
-# wet_2.get_profit()
-# wet_1.get_cost()[-1] + wet_2.get_cost()[-1] + dry_1.get_cost()[-1]
-
-# wet_1_rP.get_energy_use()
-# wet_2_rP = GP(plant_type=1, plant_capacity=5.0, tech_GP=2, raw_P=1)
-# wet_2_rP.get_energy_use()
-# dry_rP = Grain(plant_type=2, plant_capacity=120, tech_GP=2, raw_P=1)
-# dry_rP.get_energy_use()
-# dry_rP.get_rP_phytin()
