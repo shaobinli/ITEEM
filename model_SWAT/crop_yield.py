@@ -11,19 +11,12 @@ Purpose: functions for calculating crop yield and cost
 import pandas as pd
 import numpy as np
 from model_SWAT.SWAT_functions import basic_landuse, landuse_mat
+from pathlib import Path
 
-df_corn = pd.read_csv(r'C:\ITEEM\Submodel_SWAT\response_matrix_csv\yield_corn.csv')
-df_soybean = pd.read_csv(r'C:\ITEEM\Submodel_SWAT\response_matrix_csv\yield_soybean.csv')
-df_corn_silage = pd.read_csv(r'C:\ITEEM\Submodel_SWAT\response_matrix_csv\yield_corn_silage.csv')
-df_switchgrass = pd.read_csv(r'C:\ITEEM\Submodel_SWAT\response_matrix_csv\yield_switchgrass.csv')
-# sensitivity analysis
-# parset = 'Set11'
-# file_name = 'C:\ITEEM\Submodel_SWAT\sensitivity_analysis\MonthlyYields_Feb6_Parameter'+ parset +'.xlsx'
-# xls = pd.ExcelFile(file_name)
-# df_corn = pd.read_excel(xls, 'Corn')
-# df_soybean = pd.read_excel(xls, 'Soy')
-# df_corn_silage = pd.read_excel(xls, 'Corn Silage')
-
+df_corn = pd.read_csv(Path('model_SWAT/response_matrix_csv/yield_corn.csv'))
+df_soybean = pd.read_csv(Path('model_SWAT/response_matrix_csv/yield_soybean.csv'))
+df_corn_silage = pd.read_csv(Path('model_SWAT/response_matrix_csv/yield_corn_silage.csv'))
+df_switchgrass = pd.read_csv(Path('model_SWAT/response_matrix_csv/yield_switchgrass.csv'))
 
 def response_mat_crop(crop_name):
     '''
@@ -54,7 +47,7 @@ def response_mat_crop(crop_name):
 #-----Functions for land use fraction of each BMP at each subwatershed-----
 def basic_landuse2():
     '''basic case of land use: (45,1)'''
-    landuse = pd.read_excel(r'C:\ITEEM\Submodel_SWAT\landuse.xlsx', sheet_name='landuse2').fillna(0)
+    landuse = pd.read_excel(Path('model_SWAT/landuse.xlsx'), sheet_name='landuse2').fillna(0)
     cs = np.mat(landuse.iloc[:,1]).T
     cc = np.mat(landuse.iloc[:,2]).T
     sc = np.mat(landuse.iloc[:,3]).T
@@ -73,7 +66,7 @@ def get_yield_crop(crop_name, landuse_matrix):
     crop_production2 (kg): size = (year, subwatershed)
     total_area ()
     '''
-    df_corn = pd.read_excel(r'C:\ITEEM\Submodel_Economics\Economics.xlsx', sheet_name='Crop_corn')
+    df_corn = pd.read_excel(Path('model_Economics/Economics.xlsx'), sheet_name='Crop_corn')
     # df_soybean = pd.read_excel(r'C:\ITEEM\Submodel_Economics\Economics.xlsx', sheet_name='Crop_soybean')
     alpha = df_corn.iloc[:,7]
     # crop_name = 'soybean'
@@ -122,14 +115,8 @@ def get_yield_crop(crop_name, landuse_matrix):
 
 # landuse_matrix = np.zeros((45,62))
 # landuse_matrix[:,1] = 1
-# landuse_matrix[:,55] = 1
 # soy_yield = get_yield_crop('soybean', landuse_matrix)[1].sum()
-# sg_yield = get_yield_crop('switchgrass', landuse_matrix)[1].sum()
-# corn_yield = get_yield_crop('corn', landuse_matrix)[1].sum(axis=1)
-# corn_production = get_yield_crop('soybean', 'BMP00')[1]
-# corn_production = get_yield_crop('corn', landuse_matrix)[1].sum(axis=1).mean()
-# soybean_yield = get_yield_crop('soybean','BMP00')[0]
-# soybean_production = get_yield_crop('soybean','BMP00')[1]
+
 
 #-----Function for calculating crop production cost -----
 def get_crop_cost(crop_name, landuse_matrix):
@@ -138,9 +125,9 @@ def get_crop_cost(crop_name, landuse_matrix):
     cost_BMP: (year, subwatershed, BMP) for all hactares
     cost_annual: (year,1) for all subwatersheds, all BMPs, all hactares
     '''
-    df_corn = pd.read_excel(r'C:\ITEEM\Submodel_Economics\Economics.xlsx', sheet_name='Crop_corn')
-    df_soybean = pd.read_excel(r'C:\ITEEM\Submodel_Economics\Economics.xlsx', sheet_name='Crop_soybean')
-    df_switchgrass = pd.read_excel(r'C:\ITEEM\Submodel_Economics\Economics.xlsx', sheet_name='switchgrass')
+    df_corn = pd.read_excel(Path('model_Economics\Economics.xlsx'), sheet_name='Crop_corn')
+    df_soybean = pd.read_excel(Path('model_Economics\Economics.xlsx'), sheet_name='Crop_soybean')
+    df_switchgrass = pd.read_excel(Path('model_Economics\Economics.xlsx'), sheet_name='switchgrass')
     cost_corn = np.mat(df_corn.iloc[:,6]).T                  # $/ha, (56,1)
     cost_soybean = np.mat(df_soybean.iloc[:,6]).T            # $/ha, (56,1)
 

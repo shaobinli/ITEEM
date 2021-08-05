@@ -16,7 +16,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 from calendar import monthrange
-
+from pathlib import Path
 
 #-----Function for response matrix-----
 def response_mat(name):
@@ -26,22 +26,22 @@ def response_mat(name):
     '''
     if name == 'nitrate':
         # df = pd.read_excel(r'C:\ITEEM\Submodel_SWAT\Response_matrix_BMPs.xlsx',sheet_name=0)
-        df = pd.read_csv(r'C:\ITEEM\Submodel_SWAT\response_matrix_csv\yield_nitrate.csv')
+        df = pd.read_csv(Path('model_SWAT/response_matrix_csv/yield_nitrate.csv'))
     elif name == 'phosphorus':
         # df = pd.read_excel(r'C:\ITEEM\Submodel_SWAT\Response_matrix_BMPs.xlsx',sheet_name=1)
-        df = pd.read_csv(r'C:\ITEEM\Submodel_SWAT\response_matrix_csv\yield_phosphorus.csv')
+        df = pd.read_csv(Path('model_SWAT/response_matrix_csv/yield_phosphorus.csv'))
     elif name == 'sediment':
         # df = pd.read_excel(r'C:\ITEEM\Submodel_SWAT\Response_matrix_BMPs.xlsx',sheet_name=2)
-        df = pd.read_csv(r'C:\ITEEM\Submodel_SWAT\response_matrix_csv\yield_sediment.csv')
+        df = pd.read_csv(Path('model_SWAT/response_matrix_csv/yield_sediment.csv'))
     elif name == 'streamflow':
         # df = pd.read_excel(r'C:\ITEEM\Submodel_SWAT\Response_matrix_BMPs.xlsx',sheet_name=3)
-        df = pd.read_csv(r'C:\ITEEM\Submodel_SWAT\response_matrix_csv\yield_streamflow.csv')
+        df = pd.read_csv(Path('model_SWAT/response_matrix_csv/yield_streamflow.csv'))
     elif name == 'soybean':
-        df = pd.read_csv(r'C:\ITEEM\Submodel_SWAT\response_matrix_csv\yield_soybean.csv')
+        df = pd.read_csv(Path('model_SWAT/response_matrix_csv/yield_soybean.csv'))
     elif name == 'corn':
-        df = pd.read_csv(r'C:\ITEEM\Submodel_SWAT\response_matrix_csv\yield_corn.csv')
+        df = pd.read_csv(Path('model_SWAT/response_matrix_csv/yield_corn.csv'))
     elif name == 'corn sillage':
-        df = pd.read_csv(r'C:\ITEEM\Submodel_SWAT\response_matrix_csv\yield_corn_silage.csv')
+        df = pd.read_csv(Path('model_SWAT/response_matrix_csv/yield_corn_sillage.csv'))
     else:
         raise ValueError('please enter the correct names, e.g., nitrate, phosphorus, sediment')
     
@@ -68,7 +68,7 @@ def response_mat(name):
 #-----Functions for land use fraction of each BMP at each subwatershed-----
 def basic_landuse():
     '''basic case of land use'''
-    landuse = pd.read_excel(r'C:\ITEEM\Submodel_SWAT\landuse.xlsx').fillna(0)
+    landuse = pd.read_excel(Path('model_SWAT\landuse.xlsx')).fillna(0)
     land_agri = landuse.iloc[:,1] + landuse.iloc[:,2]
     land_agri = np.mat(land_agri).T
     ##return as pandas dataframe##
@@ -81,8 +81,8 @@ def landuse_mat(scenario_name):
     Return a decison matrix (# of subwatershed, # of BMPs) to decide land use fractions
     of each BMP application in each subwatershed
     '''
-    linkage = pd.read_excel(r'C:\ITEEM\Submodel_SWAT\Watershed_linkage.xlsx').fillna(0)
-    df = pd.read_csv(r'C:\ITEEM\Submodel_SWAT\response_matrix_csv\yield_nitrate.csv')
+    linkage = pd.read_excel(Path('model_SWAT\Watershed_linkage.xlsx')).fillna(0)
+    df = pd.read_csv(Path('model_SWAT/response_matrix_csv/yield_nitrate.csv'))
     row_sw = linkage.shape[0]
     '''minus 4 to subtract first two columns of subwatershed and area'''
     col_BMP = df.shape[1] - 4
@@ -203,7 +203,7 @@ def loading_outlet_modifiedRM(name, scenario_name):
     '''
     # name = 'streamflow'
     # scenario_name = 'BMP00'
-    df = pd.read_excel(r'C:\ITEEM\Submodel_SWAT\Watershed_linkage_v2.xlsx')
+    df = pd.read_excel(Path('model_SWAT\Watershed_linkage_v2.xlsx'))
     df[np.isnan(df)] = 0
     loading_BMP_sum = loading_per_sw(name, scenario_name)
     outlet = np.zeros((loading_BMP_sum.shape[0], loading_BMP_sum.shape[1], loading_BMP_sum.shape[2]))
@@ -246,7 +246,7 @@ def loading_outlet_modifiedRM(name, scenario_name):
     
     '''***********************Start of point source*************************'''
     if name == 'nitrate' or name == 'phosphorus':
-        df_point = pd.read_csv(r'C:\ITEEM\Submodel_SWAT\results_validation\SDD_interpolated_2000_2018_Inputs.csv', 
+        df_point = pd.read_csv(Path('model_SWAT/SDD_interpolated_2000_2018_Inputs.csv'), 
                           parse_dates=['Date'],index_col='Date')
         if name == 'nitrate':
             df_point = pd.DataFrame(df_point.iloc[:,0])
@@ -351,7 +351,7 @@ def outlet_scatter_plot(name):
         plt.ylabel(name +' loading at outlet (kg)', fontsize=14)
     plt.ticklabel_format(axis='y', style='sci', scilimits=(0,0))
     plt.tight_layout()
-    plt.savefig(r'C:\ITEEM\Submodel_SWAT\figures_validation\\'+name+'_'+ 'modified.tif', dpi=80)
+    plt.savefig(Path('model_SWAT\figures_validation\\'+name+'_'+ 'modified.tif'), dpi=80)
     plt.show()
     return df
 

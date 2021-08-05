@@ -18,6 +18,7 @@ from calendar import monthrange
 import scipy.io
 from model_WWT.SDD_analysis.wwt_model_SDD import WWT_SDD
 from model_SWAT.data import *
+from pathlib import Path
 
 #-----Function for connectivity matrix-----
 def watershed_linkage(**kwargs):
@@ -489,20 +490,20 @@ def loading_outlet_USRW_opt_v2(landuse_matrix, tech_wwt):
 
     if tech_wwt != 'AS': 
         if tech_wwt == 'ASCP':
-            loading_day_nitrate = scipy.io.loadmat('C:\ITEEM\Submodel_WWT\SDD_analysis\ASCP_nitrate_matrix.mat')['out']
-            loading_day_tp = scipy.io.loadmat('C:\ITEEM\Submodel_WWT\SDD_analysis\ASCP_tp_matrix.mat')['out']
+            loading_day_nitrate = scipy.io.loadmat(Path('model_WWT\SDD_analysis\ASCP_nitrate_matrix.mat'))['out']
+            loading_day_tp = scipy.io.loadmat(Path('model_WWT\SDD_analysis\ASCP_tp_matrix.mat'))['out']
     
         elif tech_wwt == 'EBPR_basic':
-            loading_day_nitrate = scipy.io.loadmat('C:\ITEEM\Submodel_WWT\SDD_analysis\EBPR_basic_nitrate_matrix.mat')['out']
-            loading_day_tp = scipy.io.loadmat(r'C:\ITEEM\Submodel_WWT\SDD_analysis\EBPR_basic_tp_matrix.mat')['out']        
+            loading_day_nitrate = scipy.io.loadmat(Path('model_WWT\SDD_analysis\EBPR_basic_nitrate_matrix.mat'))['out']
+            loading_day_tp = scipy.io.loadmat(Path('model_WWT\SDD_analysis\EBPR_basic_tp_matrix.mat'))['out']        
             
         elif tech_wwt == 'EBPR_acetate':
-            loading_day_nitrate = scipy.io.loadmat('C:\ITEEM\Submodel_WWT\SDD_analysis\EBPR_acetate_nitrate_matrix.mat')['out']
+            loading_day_nitrate = scipy.io.loadmat(Path('model_WWT\SDD_analysis\EBPR_acetate_nitrate_matrix.mat'))['out']
             loading_day_tp = scipy.io.loadmat('C:\ITEEM\Submodel_WWT\SDD_analysis\EBPR_acetate_tp_matrix.mat')['out']
     
         elif tech_wwt == 'EBPR_StR':
-            loading_day_nitrate = scipy.io.loadmat('C:\ITEEM\Submodel_WWT\SDD_analysis\EBPR_StR_nitrate_matrix.mat')['out']
-            loading_day_tp = scipy.io.loadmat('C:\ITEEM\Submodel_WWT\SDD_analysis\EBPR_StR_tp_matrix.mat')['out']
+            loading_day_nitrate = scipy.io.loadmat(Path('model_WWT\SDD_analysis\EBPR_StR_nitrate_matrix.mat'))['out']
+            loading_day_tp = scipy.io.loadmat(Path('model_WWT\SDD_analysis\EBPR_StR_tp_matrix.mat'))['out']
 
         loading_month_nitrate = np.zeros((16,12))    #16 yr, 12 month
         loading_month_tp = np.zeros((16,12))       
@@ -562,55 +563,6 @@ def sediment_instream(sw, landuse_matrix):
 # BMP0_sed_lake = sediment_instream(32, 'BMP00').sum(axis=1).mean()
 # end = time.time()
 # print('simulation time is {:.1f} seconds'.format(end-start))
-    
-def get_P_watershed(scenario_name, *args):
-    '''return annual P_nonpoint, P_point, P_reservoir, P_instream_loss, P_total_outlet, kg/yr'''
-    df_point = pd.read_csv(r'C:\ITEEM\Submodel_SWAT\results_validation\SDD_interpolated_2000_2018_Inputs.csv', 
-                  parse_dates=['Date'],index_col='Date')
-    df_point_P = pd.DataFrame(df_point.iloc[:,1])
-    df_point_P['month'] = df_point_P.index.month
-    df_point_P['year'] = df_point_P.index.year
-    df2_point = np.zeros((16,12))
-    struvite = 0
-    for i in range(16):
-        for j in range(12):
-            df2_point[i,j] = df_point_P.loc[(df_point_P.year==2003+i) & (df_point_P.month==1+j)].iloc[:,0].astype('float').sum()
-    P_point_baseline = df2_point.sum(axis=1).mean()
-    
-    if args:
-        df_eff = pd.read_csv(r'C:\ITEEM\Submodel_WWT\SDD_effluent_flow.csv', parse_dates=['Date'], index_col='Date')
-        df_eff = df_eff.iloc[:,0]
-        df_eff = pd.DataFrame(df_eff)
-        df_eff['month'] = df_eff.index.month
-        df_month = df_eff.groupby([df_eff.index.month], squeeze=True).agg('mean')
-        instance = WWT_SDD(tech=args[0])
-        output_month = instance.run_model(sample_size=1000, period='month')[1]
-        output_mean = output_month.mean(axis=1)[:,2]
-        loading_day = np.array(df_month.iloc[:,0]*output_mean*3785.4118/1000)  # loading: kg/d
-        P_point_alternative = np.zeros((16,12))                                # 16 yr, 12 month
-        for i in range(16):
-            for j in range(12):
-                    P_point_alternative[i,j] = loading_day[j]*monthrange(2003+i,j+1)[1] # loading: kg/month
-        P_point_alternative = P_point_alternative.sum(axis=1).mean()
-        P_nonpoint = loading_landscape('phosphorus', scenario_name)[1][:,:,33].sum(axis=1).mean()
-        P_reservoir = loading_landscape('phosphorus', scenario_name)[1][:,:,31].sum(axis=1).mean()/1.11 - loading_outlet_USRW('phosphorus', scenario_name)[:,:,31].sum(axis=1).mean()/1.11
-        P_instream_loss = loading_outlet_USRW('phosphorus', scenario_name, args[0])[:,:,33].sum(axis=1).mean()*0.11
-        P_total_outlet = loading_outlet_USRW('phosphorus', scenario_name, args[0])[:,:,33].sum(axis=1).mean()
-        if args[0] == 'EBPR_FBR':
-            struvite = output_month.mean(axis=1)[:,-1]*100/1000*365 # kg/year, constant flow = 100 m3, 365 days/year
-            struvite = struvite.mean() * 0.126  # 12.6% of P in struvite
-            # struvite = struvite.sum()
-    else:
-        P_nonpoint = loading_landscape('phosphorus', scenario_name)[1][:,:,33].sum(axis=1).mean()
-        P_reservoir = loading_landscape('phosphorus', scenario_name)[1][:,:,31].sum(axis=1).mean()/1.11 - loading_outlet_USRW('phosphorus', scenario_name)[:,:,31].sum(axis=1).mean()/1.11
-        P_instream_loss = loading_outlet_USRW('phosphorus', scenario_name)[:,:,33].sum(axis=1).mean()*0.11
-        P_total_outlet = loading_outlet_USRW('phosphorus', scenario_name)[:,:,33].sum(axis=1).mean()
-        P_point_alternative = 0
-    return P_nonpoint, P_point_baseline, P_point_alternative, P_reservoir, P_instream_loss, P_total_outlet, struvite
-    
-# p_watershed_baseline = get_P_watershed('BMP00','AS')
-# p_watershed_S3 = get_P_watershed('BMP50', 'EBPR_FBR')
-# p_watershed_S3[-1].sum()
 
 '''***************************** Performance metrics **************************************'''
 def pbias(obs, sim):

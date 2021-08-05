@@ -10,11 +10,12 @@ Purpose: P recovery and techno-economic anlaysis for grain processing
 import pandas as pd
 import numpy_financial as npf
 from model_Economics.discount_functions import annuity_factor
+from pathlib import Path
 
 # set up global variables
-df_wetmilling = pd.read_excel(r'C:\ITEEM\Submodel_Grain\Grain_lookup.xlsx', sheet_name='Wet_milling',
+df_wetmilling = pd.read_excel(Path('model_Grain\Grain_lookup.xlsx'), sheet_name='Wet_milling',
                              index_col=0, nrows=40, usecols = 'B:H')
-df_drygrind = pd.read_excel(r'C:\ITEEM\Submodel_Grain\Grain_lookup.xlsx', sheet_name='Dry_grind',
+df_drygrind = pd.read_excel(Path('model_Grain\Grain_lookup.xlsx'), sheet_name='Dry_grind',
                              index_col=0, nrows=40, usecols = 'B:M')
 
 depreciation_rate1 = [0.1429, 0.2449, 0.1749, 0.1249, 0.0892, 0.0893, 0.0893, 0.0446] # MACRS Depreciation (8 years)
