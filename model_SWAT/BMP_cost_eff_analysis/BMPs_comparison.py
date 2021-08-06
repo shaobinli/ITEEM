@@ -8,16 +8,16 @@ Created on Fri Nov 13 19:56:58 2020
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from Submodel_SWAT.crop_yield import basic_landuse2
-from Submodel_SWAT.SWAT_functions import basic_landuse
+from model_SWAT.crop_yield import basic_landuse2
+from model_SWAT.SWAT_functions import basic_landuse
 
 # set up global variable
-df_nitrate = pd.read_csv(r'C:\ITEEM\Submodel_SWAT\response_matrix_csv\yield_nitrate.csv')
-df_TP = pd.read_csv(r'C:\ITEEM\Submodel_SWAT\response_matrix_csv\yield_phosphorus.csv')
-df_sediment = pd.read_csv(r'C:\ITEEM\Submodel_SWAT\response_matrix_csv\yield_sediment.csv')
-df_streamflow = pd.read_csv(r'C:\ITEEM\Submodel_SWAT\response_matrix_csv\yield_streamflow.csv')
-df_corn = pd.read_csv(r'C:\ITEEM\Submodel_SWAT\response_matrix_csv\yield_corn.csv')
-df_soybean = pd.read_csv(r'C:\ITEEM\Submodel_SWAT\response_matrix_csv\yield_soybean.csv')
+df_nitrate = pd.read_csv('./model_SWAT/response_matrix_csv/yield_nitrate.csv')
+df_TP = pd.read_csv('./model_SWAT/response_matrix_csv/yield_phosphorus.csv')
+df_sediment = pd.read_csv('./model_SWAT/response_matrix_csv/yield_sediment.csv')
+df_streamflow = pd.read_csv('./model_SWAT/response_matrix_csv/yield_streamflow.csv')
+df_corn = pd.read_csv('./model_SWAT/response_matrix_csv/yield_corn.csv')
+df_soybean = pd.read_csv('./model_SWAT/response_matrix_csv/yield_soybean.csv')
 
 def response_mat_crop(crop_name):
     '''
@@ -48,8 +48,8 @@ def get_yield_crop(crop_name):
     crop_production (kg): total            size = (year, subwatershed, bmp)
     '''
     # crop_name='corn'
-    df_corn = pd.read_excel(r'C:\ITEEM\Submodel_Economics\Economics.xlsx', sheet_name='Crop_corn')
-    # df_soybean = pd.read_excel(r'C:\ITEEM\Submodel_Economics\Economics.xlsx', sheet_name='Crop_soybean')
+    df_corn = pd.read_excel('./model_Economics/Economics.xlsx', sheet_name='Crop_corn')
+    # df_soybean = pd.read_excel('./model_Economics/Economics.xlsx', sheet_name='Crop_soybean')
     alpha = df_corn.iloc[:,7]
     crop = response_mat_crop(crop_name)                    #size = (year, subwatershed, bmp)
     # landuse_matrix = landuse_mat(scenario_name)          #(45,56)
@@ -97,7 +97,7 @@ def response_mat(name):
     unit: kg/ha for nitrate, phosphorus, soy, corn, corn silage; ton/ha for sediment; mm for water yield
     '''
     if name == 'nitrate':
-        # df = pd.read_excel(r'C:\ITEEM\Submodel_SWAT\Response_matrix_BMPs.xlsx',sheet_name=0)
+        # df = pd.read_excel('./model_SWAT/Response_matrix_BMPs.xlsx',sheet_name=0)
         df = df_nitrate
     elif name == 'phosphorus':
         df = df_TP
@@ -130,8 +130,8 @@ def get_crop_cost(crop_name):
     cost_BMP_ha: (year, subwatershed, BMP); $/(yr*ha)
     '''
     # scenario_name = 'BMP00'
-    df_corn = pd.read_excel(r'C:\ITEEM\Submodel_Economics\Economics.xlsx', sheet_name='Crop_corn')
-    df_soybean = pd.read_excel(r'C:\ITEEM\Submodel_Economics\Economics.xlsx', sheet_name='Crop_soybean')
+    df_corn = pd.read_excel('./model_Economics/Economics.xlsx', sheet_name='Crop_corn')
+    df_soybean = pd.read_excel('./model_Economics/Economics.xlsx', sheet_name='Crop_soybean')
     cost_corn = np.mat(df_corn.iloc[:,6]).T                  # $/ha, (56,1)
     cost_soybean = np.mat(df_soybean.iloc[:,6]).T            # $/ha, (56,1)
     crop = response_mat_crop(crop_name)                      #size = (year, subwatershed, BMP)

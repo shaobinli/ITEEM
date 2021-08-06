@@ -7,8 +7,8 @@ Created on Mon Jul  6 16:38:07 2020
 
 import numpy as np
 # import pandas as pd
-# from Submodel_WWT.SDD_analysis.influent_SDD import influent_SDD
-# from Submodel_WWT.SDD_analysis.wwt_model_SDD import WWT_SDD
+# from model_WWT.SDD_analysis.influent_SDD import influent_SDD
+# from model_WWT.SDD_analysis.wwt_model_SDD import WWT_SDD
 
 def blower_energy(temp, Q_air, elec_price=0.0638):
     '''

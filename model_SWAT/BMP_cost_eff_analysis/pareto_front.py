@@ -8,7 +8,7 @@ Created on Sun Nov 15 17:30:05 2020
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from Submodel_SWAT.BMP_cost_eff_analysis.BMPs_comparison import bmp_compare_data
+from model_SWAT.BMP_cost_eff_analysis.BMPs_comparison import bmp_compare_data
 import seaborn as sns
 from pylab import *
 from matplotlib import colors
@@ -127,7 +127,7 @@ def pareto_front_plot(name, percent=False, *args):
     ax.set_ylabel('Crop net revenue loss ($/ha)', fontsize=12)   
     # f.colorbar(points, label = 'Cost ($/kg removal)', orientation="horizontal", aspect=40)
     plt.tight_layout()
-    plt.savefig(r'C:\ITEEM\Submodel_SWAT\BMP_cost_eff_analysis\cost_eff_analysis_figures\plot_' + name + label+ '.tif', dpi=150)
+    plt.savefig('./model_SWAT/BMP_cost_eff_analysis/cost_eff_analysis_figures/plot_' + name + label+ '.tif', dpi=150)
     plt.show()
     return data_list
 
@@ -155,11 +155,11 @@ def bmp_for_allsw(bmp, percent=False):
     return: x: kg/ha nitrate removal or %/ nitrate removal
     '''
     if percent == False:
-        score_phosphorus = scipy.io.loadmat(r'c:\ITEEM\Submodel_SWAT\BMP_cost_eff_analysis\score_phosphorus.mat')['out']
-        score_nitrate = scipy.io.loadmat(r'c:\ITEEM\Submodel_SWAT\BMP_cost_eff_analysis\score_nitrate.mat')['out']
+        score_phosphorus = scipy.io.loadmat('./model_SWAT/BMP_cost_eff_analysis/score_phosphorus.mat')['out']
+        score_nitrate = scipy.io.loadmat('./model_SWAT/BMP_cost_eff_analysis/score_nitrate.mat')['out']
     elif percent == True:
-        score_phosphorus = scipy.io.loadmat(r'c:\ITEEM\Submodel_SWAT\BMP_cost_eff_analysis\score_phosphorus_pct.mat')['out']
-        score_nitrate = scipy.io.loadmat(r'c:\ITEEM\Submodel_SWAT\BMP_cost_eff_analysis\score_nitrate_pct.mat')['out']
+        score_phosphorus = scipy.io.loadmat('./model_SWAT/BMP_cost_eff_analysis/score_phosphorus_pct.mat')['out']
+        score_nitrate = scipy.io.loadmat('./model_SWAT/BMP_cost_eff_analysis/score_nitrate_pct.mat')['out']
     '''bmp numbering start from 1, not 0'''
     f, ax = plt.subplots(figsize=(10,5))
     x = score_nitrate[:,bmp-1,0]
@@ -205,11 +205,11 @@ def cluster_sw(bmp_set, n_clusters, cluster_method, percent=False):
     # n_clusters = 10
     # percent=False
     if percent == False:
-        score_phosphorus = scipy.io.loadmat(r'c:\ITEEM\Submodel_SWAT\BMP_cost_eff_analysis\score_phosphorus.mat')['out']
-        score_nitrate = scipy.io.loadmat(r'c:\ITEEM\Submodel_SWAT\BMP_cost_eff_analysis\score_nitrate.mat')['out']
+        score_phosphorus = scipy.io.loadmat('./model_SWAT/BMP_cost_eff_analysis/score_phosphorus.mat')['out']
+        score_nitrate = scipy.io.loadmat('./model_SWAT/BMP_cost_eff_analysis/score_nitrate.mat')['out']
     elif percent == True:
-        score_phosphorus = scipy.io.loadmat(r'c:\ITEEM\Submodel_SWAT\BMP_cost_eff_analysis\score_phosphorus_pct.mat')['out']
-        score_nitrate = scipy.io.loadmat(r'c:\ITEEM\Submodel_SWAT\BMP_cost_eff_analysis\score_nitrate_pct.mat')['out']
+        score_phosphorus = scipy.io.loadmat('./model_SWAT/BMP_cost_eff_analysis/score_phosphorus_pct.mat')['out']
+        score_nitrate = scipy.io.loadmat('./model_SWAT/BMP_cost_eff_analysis/score_nitrate_pct.mat')['out']
     
     x = score_nitrate[:,bmp_set,:]  # slice BMP 37, 39, 46, 47, 48; note that 36 = BMP37
     x = np.delete(x, [7,30], axis=0)[:,:,0].mean(axis=1)
@@ -269,7 +269,7 @@ def cluster_sw(bmp_set, n_clusters, cluster_method, percent=False):
                       ec="k", fc=tab10[i], alpha=0.2, linewidth=0)
     # cluster_list = ['Cluster' + str(i+1) for i in range(n_clusters) ]
     plt.tight_layout()
-    plt.savefig(r'C:\ITEEM\Submodel_SWAT\BMP_cost_eff_analysis\cost_eff_analysis_figures\cluster_bmp' + 
+    plt.savefig('./model_SWAT/BMP_cost_eff_analysis/cost_eff_analysis_figures/cluster_bmp' + 
                 str(bmp_set) + label + cluster_method + '.tif', dpi=150)
     plt.show()
 

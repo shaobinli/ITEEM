@@ -15,11 +15,10 @@ import pandas as pd
 import numpy as np
 import time
 from calendar import monthrange
-from pathlib import Path
 
 #-----Function for connectivity matrix-----
 def watershed_linkage(**kwargs):
-    linkage = pd.read_excel(Path('model_SWAT\Watershed_linkage.xlsx')).fillna(0)
+    linkage = pd.read_excel('./model_SWAT/Watershed_linkage.xlsx').fillna(0)
     nodes = linkage.shape[0]
     linkage_W = np.zeros((nodes,nodes))
     
@@ -46,23 +45,23 @@ def response_mat(name):
     unit: kg/ha for nitrate, phosphorus, soy, corn, corn silage; ton/ha for sediment; mm for water yield
     '''
     if name == 'nitrate':
-        # df = pd.read_excel(r'C:\ITEEM\Submodel_SWAT\Response_matrix_BMPs.xlsx',sheet_name=0)
-        df = pd.read_csv(Path('model_SWAT/response_matrix_csv/yield_nitrate.csv'))
+        # df = pd.read_excel('./model_SWAT/Response_matrix_BMPs.xlsx',sheet_name=0)
+        df = pd.read_csv('./model_SWAT/response_matrix_csv/yield_nitrate.csv')
     elif name == 'phosphorus':
-        # df = pd.read_excel(r'C:\ITEEM\Submodel_SWAT\Response_matrix_BMPs.xlsx',sheet_name=1)
-        df = pd.read_csv(Path('model_SWAT/response_matrix_csv/yield_phosphorus.csv'))
+        # df = pd.read_excel('./model_SWAT/Response_matrix_BMPs.xlsx',sheet_name=1)
+        df = pd.read_csv('./model_SWAT/response_matrix_csv/yield_phosphorus.csv')
     elif name == 'sediment':
-        # df = pd.read_excel(r'C:\ITEEM\Submodel_SWAT\Response_matrix_BMPs.xlsx',sheet_name=2)
-        df = pd.read_csv(Path('model_SWAT/response_matrix_csv/yield_sediment.csv'))
+        # df = pd.read_excel('./model_SWAT/Response_matrix_BMPs.xlsx',sheet_name=2)
+        df = pd.read_csv('./model_SWAT/response_matrix_csv/yield_sediment.csv')
     elif name == 'streamflow':
-        # df = pd.read_excel(r'C:\ITEEM\Submodel_SWAT\Response_matrix_BMPs.xlsx',sheet_name=3)
-        df = pd.read_csv(Path('model_SWAT/response_matrix_csv/yield_streamflow.csv'))
+        # df = pd.read_excel('./model_SWAT/Response_matrix_BMPs.xlsx',sheet_name=3)
+        df = pd.read_csv('./model_SWAT/response_matrix_csv/yield_streamflow.csv')        
     elif name == 'soybean':
-        df = pd.read_csv(Path('model_SWAT/response_matrix_csv/yield_soybean.csv'))
+        df = pd.read_csv('./model_SWAT/response_matrix_csv/yield_soybean.csv')
     elif name == 'corn':
-        df = pd.read_csv(Path('model_SWAT/response_matrix_csv/yield_corn.csv'))
+        df = pd.read_csv('./model_SWAT/response_matrix_csv/yield_corn.csv')
     elif name == 'corn sillage':
-        df = pd.read_csv(Path('model_SWAT/response_matrix_csv/yield_corn_sillage.csv'))
+        df = pd.read_csv('./model_SWAT/response_matrix_csv/yield_corn_silage.csv')
     else:
         raise ValueError('please enter the correct names, e.g., nitrate, phosphorus, sediment')
     
@@ -93,7 +92,7 @@ def response_mat(name):
 #-----Functions for land use fraction of each BMP at each subwatershed-----
 def basic_landuse():
     '''basic case of land use'''
-    landuse = pd.read_excel(Path('model_SWAT\landuse.xlsx')).fillna(0)
+    landuse = pd.read_excel('./model_SWAT/landuse.xlsx').fillna(0)
     land_agri = landuse.iloc[:,1] + landuse.iloc[:,2]
     land_agri = np.mat(land_agri).T
     ##return as pandas dataframe##
@@ -106,8 +105,8 @@ def landuse_mat(scenario_name):
     Return a decison matrix (# of subwatershed, # of BMPs) to decide land use fractions
     of each BMP application in each subwatershed
     '''
-    linkage = pd.read_excel(Path('model_SWAT\Watershed_linkage.xlsx')).fillna(0)
-    df = pd.read_csv(Path('model_SWAT/response_matrix_csv/yield_nitrate.csv'))
+    linkage = pd.read_excel('./model_SWAT/Watershed_linkage.xlsx').fillna(0)
+    df = pd.read_csv('./model_SWAT/response_matrix_csv/yield_nitrate.csv')
     row_sw = linkage.shape[0]
     '''minus 4 to subtract first two columns of subwatershed and area'''
     col_BMP = df.shape[1] - 4
@@ -226,7 +225,7 @@ def loading_outlet_originalRM(name, landuse_matrix):
     '''
     # name = 'nitrate'
     # scenario_name = 'BMP00'
-    # df = pd.read_excel(r'C:\ITEEM\Submodel_SWAT\results_validation\NitrateAndStreamflowAtSub32.xlsx', sheet_name=2)
+    # df = pd.read_excel('./model_SWAT/results_validation/NitrateAndStreamflowAtSub32.xlsx', sheet_name=2)
     # df[np.isnan(df)] = 0
         
     linkage_W_inv = watershed_linkage()[1]

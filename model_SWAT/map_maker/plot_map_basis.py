@@ -17,9 +17,9 @@ from shapely import geometry, ops
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 # load new modules developed for ITEEM
-#from Submodel_SWAT.data_prep import N_outlet, N_yield
+#from model_SWAT.data_prep import N_outlet, N_yield
 
-#watershed_USRB = gpd.read_file('Shapefiles\Watershed.shp')
+#watershed_USRB = gpd.read_file('Shapefiles/Watershed.shp')
 #watershed_USRB.head()
 #watershed_USRB.columns
 
@@ -29,18 +29,18 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 #fig, ax = plt.subplots(1,1)
 #watershed_USRB.plot(legend=True, ax=ax, 
 #                    color="white", edgecolor="grey", linewidth=0.5)
-#reach_USRB = gpd.read_file(r'Shapefiles\reach.shp')
+#reach_USRB = gpd.read_file(r'Shapefiles/reach.shp')
 #watershed_USRB.plot(alpha=1)
 
 def plot_map_basis():
     '''month = {1,2,3..., 12}; 1 repersent January and so on.'''
-    watershed_USRB = gpd.read_file(r'C:\ITEEM\Shapefiles2\Watershed.shp')
-    reach_USRB = gpd.read_file(r'C:\ITEEM\Shapefiles2\reach.shp')
-#    dairy_sw = gpd.read_file(r'C:\ITEEM\Shapefiles2\StoneRidgeShapeFile.shp')
-#    Decatur_sw = gpd.read_file(r'C:\ITEEM\Shapefiles2\ReservoirSubbasin.shp')
-    Decatur_lake = gpd.read_file(r'C:\ITEEM\Shapefiles2\LakeDecatur\LakeDecaturPolygon.shp')
+    watershed_USRB = gpd.read_file(r'./Shapefiles2/Watershed.shp')
+    reach_USRB = gpd.read_file(r'./Shapefiles2/reach.shp')
+#    dairy_sw = gpd.read_file(r'./Shapefiles2/StoneRidgeShapeFile.shp')
+#    Decatur_sw = gpd.read_file(r'./Shapefiles2/ReservoirSubbasin.shp')
+    Decatur_lake = gpd.read_file(r'./Shapefiles2/LakeDecatur/LakeDecaturPolygon.shp')
     # extract latitude and longitude of point-source plants
-    df = pd.read_excel('C:\ITEEM\Submodel_SWAT\map_maker\plant_location.xlsx')
+    df = pd.read_excel('./model_SWAT/map_maker/plant_location.xlsx')
     gdf = gpd.GeoDataFrame(df, crs={'init': 'epsg:4326'}, 
                            geometry=gpd.points_from_xy(df.Longitude, df.Latitude))
     gdf = gdf.to_crs({'init': 'epsg:26916'})

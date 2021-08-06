@@ -28,9 +28,9 @@ from SDD_analysis.wwt_model_SDD import WWT_SDD
 from SDD_N_P_effluent_boxplot import *
 from SWAT_functions import nse
 
-df_inflow_SDD_1yr = pd.read_excel(r'C:\ITEEM\Submodel_WWT\SDD_N_P_2012-2019.xlsx', sheet_name=3,
+df_inflow_SDD_1yr = pd.read_excel('./model_WWT/SDD_N_P_2012-2019.xlsx', sheet_name=3,
                                   parse_dates=['Date'], index_col='Date')
-df_outflow_SDD_yrs = pd.read_excel(r'C:\ITEEM\Submodel_WWT\SDD_effluent.xlsx', sheet_name=0, 
+df_outflow_SDD_yrs = pd.read_excel('./model_WWT/SDD_effluent.xlsx', sheet_name=0, 
                                   parse_dates=['Date'], index_col='Date')
 
 ''''Box plot'''
@@ -173,7 +173,7 @@ def box_plot(output_name, sample_size, period, unit):
         plt.legend(loc='lower left', mode='expand', ncol=3, 
                          bbox_to_anchor=(0, 1.02, 1, 0.2), fontdict={'family':'Arial', 'size':10})
     plt.tight_layout()
-    plt.savefig(r'C:\ITEEM\Submodel_WWT\SDD_analysis\figures\SDD_Jan2021\Boxplot'+output_name+'_'+unit+'_'+period +'_exlowN_May2021.tif', dpi=300, bbox_inches = 'tight')
+    plt.savefig('./model_WWT/SDD_analysis/figures/SDD_Jan2021/Boxplot'+output_name+'_'+unit+'_'+period +'_exlowN_May2021.tif', dpi=300, bbox_inches = 'tight')
     plt.show()
 
 box_plot('Nitrate', 1000, 'year', 'loading')
@@ -256,7 +256,7 @@ def boxplot_costeff():
     plt.yticks(fontsize=10)
     plt.grid(False)
     plt.tight_layout()
-    plt.savefig(r'C:\ITEEM\Submodel_WWT\SDD_analysis\figures\SDD_Jan2021\Boxplot_Pcosteff_May_2021v2.tif', 
+    plt.savefig('./model_WWT/SDD_analysis/figures/SDD_Jan2021/Boxplot_Pcosteff_May_2021v2.tif', 
                 dpi=300, bbox_inches = 'tight')
     plt.show()
 
@@ -348,7 +348,7 @@ def dynamic_nutrient_plot(output_name, unit):
     
     fig, ax1 = plt.subplots(figsize=(6,3.5))
     ''' add SDD nitrate, TN and TP'''
-    df_point = pd.read_csv(r'C:\ITEEM\Submodel_SWAT\results_validation\SDD_interpolated_2000_2018_Inputs.csv', 
+    df_point = pd.read_csv('./model_SWAT/results_validation/SDD_interpolated_2000_2018_Inputs.csv', 
                       parse_dates=['Date'],index_col='Date')
     SDD_multiyear_data = SDD_multiyear(2006, 2015, unit)
     
@@ -411,7 +411,7 @@ def dynamic_nutrient_plot(output_name, unit):
     # ax2.plot(df, color='orange', label='inflow (m3/d)', linewidth=1)
     # ax2.set_ylabel('Inflow (m3/d)', color='orange')
     # ax2.tick_params(axis='y', labelcolor='orange')
-    plt.savefig(r'C:\ITEEM\Submodel_WWT\SDD_analysis\figures\SDD_Jan2021\Dynamic' + output_name+'_'+unit + '_exlowN_SDD_monthlyaverage_noFlow_May2021.tif', 
+    plt.savefig('./model_WWT/SDD_analysis/figures/SDD_Jan2021/Dynamic' + output_name+'_'+unit + '_exlowN_SDD_monthlyaverage_noFlow_May2021.tif', 
                 dpi=300, bbox_inches = 'tight')
     fig.tight_layout()
     plt.show()
@@ -466,7 +466,7 @@ def dynamic_inflow_plot():
     plt.ylabel('Influent (MGD)')
     plt.legend()
     plt.tight_layout()
-    plt.savefig(r'C:\ITEEM\Submodel_WWT\SDD_analysis\figures\Dec2020\influent.tif', dpi=80)
+    plt.savefig('./model_WWT/SDD_analysis/figures/Dec2020/influent.tif', dpi=80)
     plt.show()
 
 
@@ -541,7 +541,7 @@ def parallel_plot(sample_size):
     for legobj in leg.legendHandles:
         legobj.set_linewidth(2.0)
     plt.tight_layout()
-    plt.savefig(r'C:\ITEEM\Submodel_WWT\SDD_analysis\figures\Dec2020\Parallel_coordinate.tif', 
+    plt.savefig('./model_WWT/SDD_analysis/figures/Dec2020/Parallel_coordinate.tif', 
                 dpi=300, bbox_inches = 'tight')
     plt.show()
 
@@ -605,7 +605,7 @@ def joy_plot(name, sample_size):
     # for a in axes[:-1]:
     #     a.set_xscale('log')
     plt.tight_layout()
-    # plt.savefig(r'C:\ITEEM\Submodel_WWT\SDD_analysis'+ '\Joyplot_'+name+'.tif',dpi=300)
+    # plt.savefig('./model_WWT/SDD_analysis'+ '/Joyplot_'+name+'.tif',dpi=300)
     plt.show()
     
 # joy_plot(name='nitrate', sample_size=1000)

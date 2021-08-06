@@ -22,7 +22,7 @@ import time
 
 # load new modules developed for ITEEM
 from model_WWT.SDD_analysis.wwt_model_SDD import WWT_SDD
-from model_SWAT.SWAT_functions import loading_outlet_USRW, sediment_instream, get_P_watershed, loading_outlet_USRW_opt_v2 
+from model_SWAT.SWAT_functions import loading_outlet_USRW, sediment_instream, loading_outlet_USRW_opt_v2 
 from model_SWAT.crop_yield import get_yield_crop, get_crop_cost, get_P_fertilizer, get_P_corn
 from model_Grain.Grain import Grain
 from model_DWT.DWT_daily import DWT
@@ -171,20 +171,20 @@ class ITEEM(object):
         rP = rP_1 + rP_2 + rp_3
         return rP
     
-    def get_P_flow(self):
-        '''calculate P flow between submodels, metric ton/yr'''
-        P_fertilizer = get_P_fertilizer('corn', self.landuse_matrix) # 207 kg/ha DAP, 20% P in DAP 
-        P_corn_self = get_P_corn('corn', self.landuse_matrix)[0]     # 0.26% P db; 15.5% moisture;
-        P_corn_import = get_P_corn('corn', self.landuse_matrix)[1]   # 0.26% P db; 15.5% moisture;
-        P_rP = self.get_rP()*0.3/1000                                # 30% P in P complex
-        P_CGF_self_baseline = 2726*12/1000                           # 2726 ton/yr, total CGF demand; 12mg/g
-        P_CGF_self_rP = 2726*2.5/1000                                # 2726 ton/yr, total CGF demand; 12mg/g
-        P_byproducts_export_baseline = ((2.1+5)*10**6)*0.159*12/1000 + 1.03*10**6*0.289*9.31/1000 - 2726*12/1000 # 0.159 MT CGF/MT corn grain; 0.289 MT DDGS/MT corn grain
-        P_byproducts_export_rP =  ((2.1+5)*10**6)*0.159*2.5/1000 + 1.03*10**6*0.289*3.27/1000 - 2726*2.5/1000 
-        P_manure_baseline = loading_outlet_USRW('phosphorus', 'BMP00')[:,:,7].sum(axis=1).mean()/1000 # subwatershed=7; 
-        P_manure_rP = loading_outlet_USRW('phosphorus', 'BMP19')[:,:,7].sum(axis=1).mean()/1000       # subwatershed=7; 
-        P_watershed = get_P_watershed(self.landuse_matrix, self.tech_wwt)/1000        # include point, non-point, etc.
-        return P_fertilizer, P_corn_self, P_corn_import, P_rP, P_CGF_self_baseline, P_CGF_self_rP, P_byproducts_export_baseline, P_byproducts_export_rP, P_manure_baseline, P_manure_rP, P_watershed
+    # def get_P_flow(self):
+    #     '''calculate P flow between submodels, metric ton/yr'''
+    #     P_fertilizer = get_P_fertilizer('corn', self.landuse_matrix) # 207 kg/ha DAP, 20% P in DAP 
+    #     P_corn_self = get_P_corn('corn', self.landuse_matrix)[0]     # 0.26% P db; 15.5% moisture;
+    #     P_corn_import = get_P_corn('corn', self.landuse_matrix)[1]   # 0.26% P db; 15.5% moisture;
+    #     P_rP = self.get_rP()*0.3/1000                                # 30% P in P complex
+    #     P_CGF_self_baseline = 2726*12/1000                           # 2726 ton/yr, total CGF demand; 12mg/g
+    #     P_CGF_self_rP = 2726*2.5/1000                                # 2726 ton/yr, total CGF demand; 12mg/g
+    #     P_byproducts_export_baseline = ((2.1+5)*10**6)*0.159*12/1000 + 1.03*10**6*0.289*9.31/1000 - 2726*12/1000 # 0.159 MT CGF/MT corn grain; 0.289 MT DDGS/MT corn grain
+    #     P_byproducts_export_rP =  ((2.1+5)*10**6)*0.159*2.5/1000 + 1.03*10**6*0.289*3.27/1000 - 2726*2.5/1000 
+    #     P_manure_baseline = loading_outlet_USRW('phosphorus', 'BMP00')[:,:,7].sum(axis=1).mean()/1000 # subwatershed=7; 
+    #     P_manure_rP = loading_outlet_USRW('phosphorus', 'BMP19')[:,:,7].sum(axis=1).mean()/1000       # subwatershed=7; 
+    #     P_watershed = get_P_watershed(self.landuse_matrix, self.tech_wwt)/1000        # include point, non-point, etc.
+    #     return P_fertilizer, P_corn_self, P_corn_import, P_rP, P_CGF_self_baseline, P_CGF_self_rP, P_byproducts_export_baseline, P_byproducts_export_rP, P_manure_baseline, P_manure_rP, P_watershed
 
     def run_ITEEM(self, sw=33, r=0.07, n_wwt=40, nutrient_index=1.0, flow_index=1.0, chem_index=1.0, rP_index=1.0, 
                   utility_index=1.0, grain_product_index=1.0, feedstock_index=1.0, crop_index=1.0, unit_pay=0.95, wtp_price=0.95):

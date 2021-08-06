@@ -18,7 +18,6 @@ from calendar import monthrange
 import scipy.io
 from model_WWT.SDD_analysis.wwt_model_SDD import WWT_SDD
 from model_SWAT.data import *
-from pathlib import Path
 
 #-----Function for connectivity matrix-----
 def watershed_linkage(**kwargs):
@@ -48,7 +47,7 @@ def response_mat(name):
     unit: kg/ha for nitrate, phosphorus, soy, corn, corn silage; ton/ha for sediment; mm for water yield
     '''
     if name == 'nitrate':
-        # df = pd.read_excel(r'C:\ITEEM\Submodel_SWAT\Response_matrix_BMPs.xlsx',sheet_name=0)
+        # df = pd.read_excel('./model_SWAT/Response_matrix_BMPs.xlsx',sheet_name=0)
         df = df_nitrate
     elif name == 'phosphorus':
         df = df_TP
@@ -490,20 +489,20 @@ def loading_outlet_USRW_opt_v2(landuse_matrix, tech_wwt):
 
     if tech_wwt != 'AS': 
         if tech_wwt == 'ASCP':
-            loading_day_nitrate = scipy.io.loadmat(Path('model_WWT\SDD_analysis\ASCP_nitrate_matrix.mat'))['out']
-            loading_day_tp = scipy.io.loadmat(Path('model_WWT\SDD_analysis\ASCP_tp_matrix.mat'))['out']
+            loading_day_nitrate = scipy.io.loadmat('./model_WWT/SDD_analysis/ASCP_nitrate_matrix.mat')['out']
+            loading_day_tp = scipy.io.loadmat('./model_WWT/SDD_analysis/ASCP_tp_matrix.mat')['out']
     
         elif tech_wwt == 'EBPR_basic':
-            loading_day_nitrate = scipy.io.loadmat(Path('model_WWT\SDD_analysis\EBPR_basic_nitrate_matrix.mat'))['out']
-            loading_day_tp = scipy.io.loadmat(Path('model_WWT\SDD_analysis\EBPR_basic_tp_matrix.mat'))['out']        
+            loading_day_nitrate = scipy.io.loadmat('./model_WWT/SDD_analysis/EBPR_basic_nitrate_matrix.mat')['out']
+            loading_day_tp = scipy.io.loadmat('./model_WWT/SDD_analysis/EBPR_basic_tp_matrix.mat')['out']        
             
         elif tech_wwt == 'EBPR_acetate':
-            loading_day_nitrate = scipy.io.loadmat(Path('model_WWT\SDD_analysis\EBPR_acetate_nitrate_matrix.mat'))['out']
-            loading_day_tp = scipy.io.loadmat('C:\ITEEM\Submodel_WWT\SDD_analysis\EBPR_acetate_tp_matrix.mat')['out']
+            loading_day_nitrate = scipy.io.loadmat('./model_WWT/SDD_analysis/EBPR_acetate_nitrate_matrix.mat')['out']
+            loading_day_tp = scipy.io.loadmat('./model_WWT/SDD_analysis/EBPR_acetate_tp_matrix.mat')['out']
     
         elif tech_wwt == 'EBPR_StR':
-            loading_day_nitrate = scipy.io.loadmat(Path('model_WWT\SDD_analysis\EBPR_StR_nitrate_matrix.mat'))['out']
-            loading_day_tp = scipy.io.loadmat(Path('model_WWT\SDD_analysis\EBPR_StR_tp_matrix.mat'))['out']
+            loading_day_nitrate = scipy.io.loadmat('./model_WWT/SDD_analysis/EBPR_StR_nitrate_matrix.mat')['out']
+            loading_day_tp = scipy.io.loadmat('./model_WWT/SDD_analysis/EBPR_StR_tp_matrix.mat')['out']
 
         loading_month_nitrate = np.zeros((16,12))    #16 yr, 12 month
         loading_month_tp = np.zeros((16,12))       
@@ -563,6 +562,7 @@ def sediment_instream(sw, landuse_matrix):
 # BMP0_sed_lake = sediment_instream(32, 'BMP00').sum(axis=1).mean()
 # end = time.time()
 # print('simulation time is {:.1f} seconds'.format(end-start))
+
 
 '''***************************** Performance metrics **************************************'''
 def pbias(obs, sim):
@@ -669,7 +669,7 @@ def dynamic_plot(name, time_period, sw):
     # plt.legend(loc='upper left', fontsize=12 )
     plt.legend(fontsize=12, loc='center left', bbox_to_anchor=(0.03, 1.2), ncol=2)
     plt.tight_layout()
-    # plt.savefig(r'C:\ITEEM\ITEEM_figures\July\\'+name+'_'+ time_period + str(sw) +'_loading.tif', dpi=150)
+    # plt.savefig('./ITEEM_figures/July//'+name+'_'+ time_period + str(sw) +'_loading.tif', dpi=150)
     plt.show()
     return
 

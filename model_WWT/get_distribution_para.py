@@ -18,13 +18,11 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.stats import norm, lognorm, triang, gamma, beta
 from fitter import Fitter
-from pathlib import Path
-
 
 def get_monthly_ave(name):
     '''return a np(year,month) for effluent and prec of SDD'''
     if name == 'effluent':
-        df = pd.read_excel(Path('model_WWT/SDD_effluent.xlsx'), parse_dates=['Date'], index_col='Date')
+        df = pd.read_excel('./model_WWT/SSD_effluent.xlsx', parse_dates=['Date'], index_col='Date')
         df = df.dropna()
         df = df[(df.iloc[:,0]<115)]
         mask = (df != 0).any(axis=1)
@@ -33,7 +31,7 @@ def get_monthly_ave(name):
         df['month'] = df.index.month
         df['year'] = df.index.year
     elif name =='precipitation':
-         df = pd.read_excel(Path('model_WWT/SDD_effluent.xlsx'), parse_dates=['Date'], index_col='Date', sheet_name=1)
+         df = pd.read_excel('./model_WWT/SSD_effluent.xlsx', parse_dates=['Date'], index_col='Date', sheet_name=1)
          df = df.dropna()
          df_min, df_max = min(df.iloc[:,0]), max(df.iloc[:,0])  
          df['month'] = df.index.month
@@ -49,7 +47,7 @@ def get_monthly_ave(name):
 # output_prec = get_monthly_ave('precipitation').flatten()
 
 def get_lognormal_effluent():
-    df = pd.read_excel(Path('model_WWT/SDD_effluent.xlsx'), parse_dates=['Date'], index_col='Date')
+    df = pd.read_excel('./model_WWT/SSD_effluent.xlsx', parse_dates=['Date'], index_col='Date')
     df = df.dropna()
     df = df[(df.iloc[:,0]<115)]
     mask = (df != 0).any(axis=1)
@@ -86,7 +84,7 @@ def get_lognormal_effluent():
 
 def get_lognormal_para(name):
     name = 'Inflow'
-    df = pd.read_excel(Path('model_WWT\SDD_N_P_2012-2019.xlsx'), 
+    df = pd.read_excel('./model_WWT/SDD_N_P_2012-2019.xlsx', 
                        parse_dates=['Date'], index_col='Date', sheet_name=1)
     start_date = '2012-08-01'
     end_date = '2019-8-15'
@@ -131,8 +129,8 @@ def get_lognormal_para(name):
 #parameter_inflow_lognorm = get_lognormal_para('Inflow')
 
 def get_normal_para(name):
-    df = pd.read_excel(Path('model_WWT\SDD_N_P_2012-2019.xlsx', 
-                       parse_dates=['Date'], index_col='Date',sheet_name=1))
+    df = pd.read_excel('./model_WWT/SDD_N_P_2012-2019.xlsx', 
+                       parse_dates=['Date'], index_col='Date',sheet_name=1)
     start_date = '2012-08-01'
     end_date = '2019-8-15'
     mask = (df.index > start_date) & (df.index <= end_date)
@@ -171,8 +169,8 @@ def get_normal_para(name):
 #parameter_inflow_norm = get_normal_para('Inflow')
 
 def get_triang_para(name):
-    df = pd.read_excel(Path('model_WWT\SDD_N_P_2012-2019.xlsx',
-                       parse_dates=['Date'], index_col='Date',sheet_name= 1))
+    df = pd.read_excel('./model_WWT/SDD_N_P_2012-2019.xlsx',
+                       parse_dates=['Date'], index_col='Date',sheet_name= 1)
     start_date = '2012-08-01'
     end_date = '2019-8-15'
     mask = (df.index > start_date) & (df.index <= end_date)

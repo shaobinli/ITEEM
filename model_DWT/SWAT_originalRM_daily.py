@@ -205,7 +205,7 @@ def loading_outlet_originalRM(name, landuse_matrix):
     '''
     # name = 'nitrate'
     # scenario_name = 'BMP00'
-    # df = pd.read_excel(r'C:\ITEEM\Submodel_SWAT\results_validation\NitrateAndStreamflowAtSub32.xlsx', sheet_name=2)
+    # df = pd.read_excel('./model_SWAT\results_validation\NitrateAndStreamflowAtSub32.xlsx', sheet_name=2)
     # df[np.isnan(df)] = 0
         
     linkage_W_inv = watershed_linkage()[1]

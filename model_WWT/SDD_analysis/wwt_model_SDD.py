@@ -162,7 +162,7 @@ class WWT_SDD(object):
             cost_material = 1210000
         output_scaled, outputs, influent = self.run_model(sample_size, nutrient_index, flow_index)
         
-        # from Submodel_SWAT.SWAT_functions import loading_outlet_USRW_opt
+        # from model_SWAT.SWAT_functions import loading_outlet_USRW_opt
         # outlet_nitrate, outlet_tp = loading_outlet_USRW_opt(landuse_matrix, self.tech, outputs, influent)
         # from model_SWAT.SWAT_functions import loading_outlet_USRW
         from model_SWAT.SWAT_functions import loading_outlet_USRW

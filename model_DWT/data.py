@@ -8,11 +8,11 @@ Created on Tue Jul  6 02:58:05 2021
 import pandas as pd
 from pathlib import Path
 
-# set up global variables, relative path start from ITEEM\...
+# set up global variables, relative path start from ITEEM/...
 
 # yield_streamflow_daily.csv file larger than 100 MB, cannot upload to github; need to find another way to upload
-df_nitrate_daily_path = Path(r'C:\ITEEM\Submodel_SWAT\response_matrix_csv\yield_nitrate_daily.csv')  
-df_streamflow_daily_path = Path(r'model_SWAT\response_matrix_csv\yield_streamflow_daily.csv')
+df_nitrate_daily_path = Path('./model_SWAT/response_matrix_csv/yield_nitrate_daily.csv')  
+df_streamflow_daily_path = Path('./model_SWAT/response_matrix_csv/yield_streamflow_daily.csv')
 
 df_nitrate_daily = pd.read_csv(df_nitrate_daily_path)
 df_streamflow_daily = pd.read_csv(df_streamflow_daily_path)

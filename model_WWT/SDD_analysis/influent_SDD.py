@@ -11,12 +11,14 @@ Scripts used to MC sampling of influents
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from pathlib import Path
 
 # set global variable
-df_inflow_SDD_1yr = pd.read_csv(Path(r'model_WWT\SDD_N_P_2012_2019.csv'), parse_dates=['Date'], index_col='Date')
-df_outflow_SDD_yrs = pd.read_csv(Path('model_WWT\SDD_effluent.csv'), parse_dates=['Date'], index_col='Date')
-df_influent_SDD_yrs = pd.read_csv(Path('model_WWT\SDD_N_P_1989_2020.csv'), parse_dates=['Date'], index_col='Date')
+df_inflow_SDD_1yr = pd.read_excel('./model_WWT/SDD_N_P_2012-2019.xlsx', sheet_name=3,
+                                  parse_dates=['Date'], index_col='Date')
+df_outflow_SDD_yrs = pd.read_excel('./model_WWT/SDD_effluent.xlsx', sheet_name=0, 
+                                  parse_dates=['Date'], index_col='Date')
+df_influent_SDD_yrs = pd.read_excel('./model_WWT/SDD_N_P_1989_2020.xlsx', parse_dates=['Date'],
+                        index_col='Date')
 
 def influent_SDD(sample_size):
     '''    
@@ -318,7 +320,7 @@ def SDD_multiyear(start_yr, end_yr, unit):
     '''
     return monthly loading of influents and effluents: TN, Nitrate, TP, etc.
     '''    
-    # df = pd.read_excel(r'C:\ITEEM\Submodel_WWT\SDD_N_P_1989_2020.xlsx', parse_dates=['Date'],
+    # df = pd.read_excel('./model_WWT/SDD_N_P_1989_2020.xlsx', parse_dates=['Date'],
     #                     index_col='Date')
     df = df_influent_SDD_yrs
     # start_yr = 2003
@@ -423,7 +425,7 @@ def plot_sdd_multiyear_influent(output_name):
          
     plt.xlabel('Time (2006-2015)', fontsize=14)
     fig.tight_layout()
-    # plt.savefig(r'C:\ITEEM\Submodel_WWT\SDD_analysis\figures\SDD_Jan2021\influent'+ output_name+'.tif', dpi=80)
+    plt.savefig('./model_WWT/SDD_analysis/figures/SDD_Jan2021/influent'+ output_name+'.tif', dpi=80)
     plt.show()
     return
 

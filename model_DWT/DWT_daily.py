@@ -17,10 +17,9 @@ from calendar import monthrange
 from model_DWT.SWAT_originalRM_daily import loading_outlet_originalRM 
 from model_SWAT.SWAT_functions import sediment_instream, loading_outlet_USRW
 from model_Economics.discount_functions import annuity_factor, pv, real_dr, cost_inflation
-from pathlib import Path
 
 # set up global variable
-df_nitrate_yield = pd.read_csv(Path('model_SWAT/response_matrix_csv/yield_nitrate.csv'))
+df_nitrate_yield = pd.read_csv('./model_SWAT/response_matrix_csv/yield_nitrate.csv')
 
 class DWT(object):
     '''
@@ -160,4 +159,4 @@ class DWT(object):
 
 if __name__ == "__main__":
     # set up global variable
-    df_nitrate_yield = pd.read_csv(r'model_SWAT\response_matrix_csv\yield_nitrate.csv')
+    df_nitrate_yield = pd.read_csv('model_SWAT/response_matrix_csv/yield_nitrate.csv')
