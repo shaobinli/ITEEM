@@ -22,8 +22,8 @@ import time
 
 # load new modules developed for ITEEM
 from model_WWT.SDD_analysis.wwt_model_SDD import WWT_SDD
-from model_SWAT.SWAT_functions import loading_outlet_USRW, sediment_instream, loading_outlet_USRW_opt_v2 
-from model_SWAT.crop_yield import get_yield_crop, get_crop_cost, get_P_fertilizer, get_P_corn
+from model_SWAT.SWAT_functions import get_yield, loading_outlet_USRW, sediment_instream, get_P_riverine, get_P_biosolid, loading_outlet_USRW_opt_v2 
+from model_SWAT.crop_yield import get_yield_crop, get_crop_cost, response_mat_crop, get_P_crop, get_P_fertilizer
 from model_Grain.Grain import Grain
 from model_DWT.DWT_daily import DWT
 from model_Economics.Economics import Economics
@@ -47,49 +47,52 @@ class ITEEM(object):
         self.tech_GP2 = tech_GP2
         self.tech_GP3 = tech_GP3
 
-    def get_N_outlet(self, sw, nutrient_index=1, flow_index=1):
-        '''sw = subwatershed location;
-        nutrinet_index and flow_index are used for sensitivity analysis. default value=1'''
-        N_loading = loading_outlet_USRW('nitrate', self.landuse_matrix, self.tech_wwt, nutrient_index, flow_index)
-        N_outlet = N_loading[:,:,sw]
-        return N_outlet
+    def get_load(self, name, nutrient_index=1, flow_index=1):
+        '''
+        used for dynamic plot. time series –> click specific watershed -> popup plots for the subwatershed [SPECIFIC]
+        name = ['nitrate', 'phosphorus', 'streamflow']                                                     [33: GENERAL]
+        output unit: (nitrate or phosphorus: kg/month or kg/yr) or (streamflow: m3/month, m3/yr)
+        sw = subwatershed location, staring from 0; outlet: sw=33
+        nutrinet_index and flow_index are used for sensitivity analysis. default value=1
+        return: numpy array (16,12) = (year,month); starting year January, 2003
+        '''
+        load = loading_outlet_USRW(name, self.landuse_matrix, self.tech_wwt, nutrient_index, flow_index)
+        # load_sw = load[:,:,sw]
+        return load.tolist()
     
-    def get_P_outlet(self, sw, nutrient_index, flow_index):
-        '''sw = subwatershed location;
-        nutrinet_index and flow_index are used for sensitivity analysis. default value=1'''
-        TP_loading = loading_outlet_USRW('phosphorus', self.landuse_matrix, self.tech_wwt, nutrient_index, flow_index)
-        TP_outlet = TP_loading[:,:,sw]
-        return TP_outlet
+    def get_yield(self, name):
+        '''
+        used for map plot -> Gradient (dropdown)
+        name = ['nitrate', 'phosphorus', 'streamflow']     
+        output: nonpoint yield from SWAT, kg/hactere (kg) or m3/ha  
+        return: average yield, kg/ha per yr
+        '''
+        yield_data = get_yield(name, self.landuse_matrix)[1]  # shape: numpy array (16,12,45) = (year, month, subwatersheds)
+        yield_data = yield_data.sum(axis=1).mean(axis=0) # shape: (45, )
+        return yield_data.tolist()
+        
+    def get_sediment_load(self, sw):
+        '''
+        used for simulating dynamic sediment load, kg/month
+        (subcategory of get_load)                            [33: GENERAL]
+        return: numpy array (16,12,45) = (year, month, subwatersheds)
+        '''
+        sediment_load = np.zeros((16,12,45))
+        for sw in range(45):         
+            sediment_load[:,:,sw] = sediment_instream(sw, self.landuse_matrix)
+        return sediment_load, sediment_load.tolist()
     
-    def get_streamflow_outlet(self,sw):
-        streamflow_loading = loading_outlet_USRW('streamflow', self.landuse_matrix)
-        streamflow_outlet = streamflow_loading[:,:,sw]
-        return streamflow_outlet  
-
-    def get_sediment_outlet(self,sw):
-        sediment_outlet = sediment_instream(sw, self.landuse_matrix)
-        # sediment_loading = loading_outlet_USRW('sediment', self.landuse_matrix, self.tech_wwt)
-        # sediment_outlet = sediment_loading[:,:,33]
-        return sediment_outlet
+    def get_crop(self, crop_name):
+        '''
+        crop_name = ['corn', 'soybean', 'switchgrass']
+        return:
+            1. crop_yield, kg/ha, used for map plot (16, 45) -> Gradient (dropdown)
+            2. crop_production (similar pollutant load),kg/yr, used for dynamic plot (16,45) -> time series plot [Sum Up: GENERAL]
+        '''
+        # crop_yield = response_mat_crop(crop_name).sum(axis=2) # (16, 45) = (year, sw)
+        _, crop_production, crop_yield = get_yield_crop(crop_name, self.landuse_matrix)
+        return crop_yield.tolist(), crop_production.tolist()
     
-    def get_corn(self):
-        '''return corn production per year, kg/yr'''
-        corn = get_yield_crop('corn', self.landuse_matrix)[1]
-        corn = corn.sum(axis=1).mean()
-        return corn
-    
-    def get_soybean(self):
-        '''return soybean production per year, kg/yr'''
-        soybean = get_yield_crop('soybean', self.landuse_matrix)[1]
-        soybean = soybean.sum(axis=1).mean()
-        return soybean
-    
-    def get_biomass(self):
-        '''return soybean production per year, kg/yr'''
-        biomass = get_yield_crop('switchgrass', self.landuse_matrix)[1]
-        biomass = biomass.sum(axis=1).mean()
-        return biomass
-
     def get_cost_energy(self, r=0.07, n_wwt=40, nutrient_index=1.0, flow_index=1.0, 
                         chem_index=1.0, utility_index=1.0, rP_index=1.0, feedstock_index=1.0, crop_index=1.0):
         '''
@@ -171,21 +174,83 @@ class ITEEM(object):
         rP = rP_1 + rP_2 + rp_3
         return rP
     
-    # def get_P_flow(self):
-    #     '''calculate P flow between submodels, metric ton/yr'''
-    #     P_fertilizer = get_P_fertilizer('corn', self.landuse_matrix) # 207 kg/ha DAP, 20% P in DAP 
-    #     P_corn_self = get_P_corn('corn', self.landuse_matrix)[0]     # 0.26% P db; 15.5% moisture;
-    #     P_corn_import = get_P_corn('corn', self.landuse_matrix)[1]   # 0.26% P db; 15.5% moisture;
-    #     P_rP = self.get_rP()*0.3/1000                                # 30% P in P complex
-    #     P_CGF_self_baseline = 2726*12/1000                           # 2726 ton/yr, total CGF demand; 12mg/g
-    #     P_CGF_self_rP = 2726*2.5/1000                                # 2726 ton/yr, total CGF demand; 12mg/g
-    #     P_byproducts_export_baseline = ((2.1+5)*10**6)*0.159*12/1000 + 1.03*10**6*0.289*9.31/1000 - 2726*12/1000 # 0.159 MT CGF/MT corn grain; 0.289 MT DDGS/MT corn grain
-    #     P_byproducts_export_rP =  ((2.1+5)*10**6)*0.159*2.5/1000 + 1.03*10**6*0.289*3.27/1000 - 2726*2.5/1000 
-    #     P_manure_baseline = loading_outlet_USRW('phosphorus', 'BMP00')[:,:,7].sum(axis=1).mean()/1000 # subwatershed=7; 
-    #     P_manure_rP = loading_outlet_USRW('phosphorus', 'BMP19')[:,:,7].sum(axis=1).mean()/1000       # subwatershed=7; 
-    #     P_watershed = get_P_watershed(self.landuse_matrix, self.tech_wwt)/1000        # include point, non-point, etc.
-    #     return P_fertilizer, P_corn_self, P_corn_import, P_rP, P_CGF_self_baseline, P_CGF_self_rP, P_byproducts_export_baseline, P_byproducts_export_rP, P_manure_baseline, P_manure_rP, P_watershed
+    def get_P_flow(self):
+        '''calculate P flow between submodels, metric ton/yr'''
+        '''P_riverine'''
+        # P_nonpoint, P_point, P_reservoir, P_instream_store, P_total_outlet, struvite
+        P_nonpoint, P_point, P_reservoir, P_instream_store, P_total_outlet, struvite = get_P_riverine(self.landuse_matrix, self.tech_wwt)
+        P_SDD_influent = 676.8 # MT/yr
+        # P_point_baseline = 582.4 # MT/yr
+        # P_nonpoint_baseline = 292.9 # MT/yr
+        in_stream_load = P_nonpoint + P_point
+        
+        '''P_biosolid'''
+        P_in_biosolid, P_crop_biosolid, P_riverine_biosolid, P_soil_biosolid = get_P_biosolid(self.tech_wwt)
+        
+        '''P_crop & P_fertilizer'''
+        P_fertilizer = get_P_fertilizer('corn', self.landuse_matrix) # MT/yr
+        P_corn_self, P_corn_import, P_soybean, P_sg = get_P_crop(self.landuse_matrix)
+        P_crop_list = [P_corn_self, P_corn_import, P_soybean, P_sg]
+        # P_fertilizer_net = P_fertilizer - P_crop_biosolid
+        
+        '''P_corn_biorefinery'''
+        P_in1, P_product1, P_other1, rP1 = Grain(plant_type=1, plant_capacity=2.1, tech_GP=self.tech_GP1).get_P_flow()
+        P_in2, P_product2, P_other2, rP2 = Grain(plant_type=1, plant_capacity=5.0, tech_GP=self.tech_GP2).get_P_flow()
+        P_in3, P_product3, P_other3, rP3 = Grain(plant_type=2, plant_capacity=120, tech_GP=self.tech_GP3).get_P_flow()
+        P_cb_in = P_in1 + P_in2 + P_in3
+        P_cb_rP = rP1 + rP2 + rP3
+        P_cb_product = P_cb_in - P_cb_rP
+        P_cb_list = [P_cb_in, P_cb_rP, P_cb_product]
+        
+        '''P_manure'''
+        P_corn_silage = 24.7                 # 10487*908.6*0.26/100/1000 #10487 kg/ha, 908.6 ha, assume 0.26%
+        if self.tech_GP1==1 and self.tech_GP2==1 and self.tech_GP3==1:
+            P_CGF = 2726*12/1000             # 2726 ton/yr, total CGF demand for StoneDairy; 12mg/g
+            P_manure = 67.8
+            P_manure_runoff = 1.932
+            P_manure_soil = P_manure - P_manure_runoff - P_corn_silage
+        else:
+            P_CGF = 2726*2.5/1000            # 2726 ton/yr, total CGF demand for StoneDairy; 12mg/g
+            P_manure = 67.8 - (2726*12/1000-2726*2.5/1000)  #
+            P_manure_runoff = 1.700
+            P_manure_soil = P_manure - P_manure_runoff - P_corn_silage
+        P_manure_list = [P_manure, P_manure_runoff, P_manure_soil, P_CGF]
+        P_rP = P_cb_list[1] + struvite
+        P_soil = P_soil_biosolid + P_manure_list[2] 
+        P_soil_fertilizer = P_fertilizer -  P_corn_self - P_soybean - P_sg - P_soil_biosolid - P_nonpoint
+        
+        '''P_list'''
+        P_in_list  = [P_crop_list[1], P_fertilizer, P_manure_list[0], P_SDD_influent]
+        P_out_list = [P_cb_list[2], P_rP, P_crop_list[2], P_corn_silage, P_soil, P_soil_fertilizer,
+                     P_total_outlet,  P_reservoir,  P_instream_store]
+        
+        P_intermediate_list = [in_stream_load, P_crop_list[0], P_crop_biosolid]
 
+        '''adjustment coefficient'''
+        P_in = sum(P_in_list); P_out = sum(P_out_list); coef = (P_out - P_in)/P_in
+        P_out_list_adj = [(1-coef)*x for x in P_out_list]
+        
+        if P_soil_fertilizer > 0:
+            output_list = [P_corn_import, P_nonpoint, P_corn_self, P_soybean, P_soil_fertilizer, P_sg,
+                           P_manure_runoff, P_corn_silage, P_manure_soil, 
+                           P_point,  P_crop_biosolid, struvite, P_soil_biosolid,
+                           P_cb_product, P_cb_rP,
+                           P_total_outlet, P_reservoir, P_instream_store,
+                           P_corn_self+P_crop_biosolid
+                           ]
+        elif P_soil_fertilizer < 0:
+            output_list = [P_corn_import, P_nonpoint, P_corn_self+P_soil_fertilizer*0.65, P_soybean+P_soil_fertilizer*0.35, 
+                           P_sg, P_manure_runoff, P_corn_silage, 
+                           P_point,  P_crop_biosolid, struvite, P_soil_biosolid,
+                           P_cb_product, P_cb_rP,
+                           P_total_outlet, P_reservoir, P_instream_store,
+                           P_corn_self+P_crop_biosolid,
+                           P_soil_fertilizer*-0.65, P_soil_fertilizer*-0.35
+                           ]
+
+        return P_in_list, P_intermediate_list, P_out_list_adj, P_soil_fertilizer, output_list
+    
+    
     def run_ITEEM(self, sw=33, r=0.07, n_wwt=40, nutrient_index=1.0, flow_index=1.0, chem_index=1.0, rP_index=1.0, 
                   utility_index=1.0, grain_product_index=1.0, feedstock_index=1.0, crop_index=1.0, unit_pay=0.95, wtp_price=0.95):
         '''
@@ -254,9 +319,9 @@ class ITEEM(object):
             rP_struvite = 1283150*0.1262   # 12.62% P in struvite, kg/yr
         else: rP_struvite = 0
         
-        corn = self.get_corn()        # kg/yr
-        soybean = self.get_soybean()  # kg/yr
-        biomass = self.get_biomass()  # kg/yr
+        corn = self.get_crop('corn')[1]        # kg/yr
+        soybean = self.get_soybean('soybean')[1]  # kg/yr
+        biomass = self.get_biomass('switchgrass')[1]  # kg/yr
         
         environment = [N_outlet, P_outlet, sediment_outlet_landscape, sediment_outlet, streamflow_outlet]
         energy = [energy_dwt, energy_grain, energy_wwt.mean(), biomass]
@@ -275,6 +340,6 @@ class ITEEM(object):
 # landuse_matrix_baseline[:,55] = 0.25
 # landuse_matrix_baseline[:,37] = 0.75
 # baseline = ITEEM(landuse_matrix_baseline, tech_wwt='AS', limit_N=10.0, tech_GP1=1, tech_GP2=1, tech_GP3=1)
-# output = baseline.run_ITEEM()
+# output = baseline.get_P_flow()
 # end = time.time()
 # print('Simulation time is: ', end - start)

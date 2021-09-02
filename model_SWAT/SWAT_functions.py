@@ -563,6 +563,48 @@ def sediment_instream(sw, landuse_matrix):
 # end = time.time()
 # print('simulation time is {:.1f} seconds'.format(end-start))
 
+def get_P_riverine(scenario_name, tech_wwt):
+    '''return annual P_nonpoint, P_point, P_reservoir, P_instream_loss, P_total_outlet, kg/yr'''
+    P_point = 582.4 # MT/yr
+    struvite = 0
+    if tech_wwt == 'ASCP':
+        loading_day_tp = scipy.io.loadmat('C:\ITEEM\Submodel_WWT\SDD_analysis\ASCP_tp_matrix.mat')['out']
+    elif tech_wwt == 'EBPR_basic':
+        loading_day_tp = scipy.io.loadmat(r'C:\ITEEM\Submodel_WWT\SDD_analysis\EBPR_basic_tp_matrix.mat')['out']        
+    elif tech_wwt == 'EBPR_acetate':
+        loading_day_tp = scipy.io.loadmat('C:\ITEEM\Submodel_WWT\SDD_analysis\EBPR_acetate_tp_matrix.mat')['out']
+    elif tech_wwt == 'EBPR_StR':
+        loading_day_tp = scipy.io.loadmat('C:\ITEEM\Submodel_WWT\SDD_analysis\EBPR_StR_tp_matrix.mat')['out']
+        struvite = 450 # kg/year, TP in pellect collection (mixtured of struvite and others), calculated from Aryan.
+    
+    if tech_wwt != 'AS':
+        P_point = np.zeros((16,12))       
+        for i in range(16):
+            for j in range(12):
+                P_point[i,j] = loading_day_tp[i,j]*monthrange(2003+i,j+1)[1] # loading: kg/month 
+        P_point = P_point.sum(axis=1).mean()/1000   # MT/yr
+    
+    P_nonpoint = loading_landscape('phosphorus', scenario_name)[1][:,:,33].sum(axis=1).mean()/1000   # MT/yr
+    P_reservoir = loading_landscape('phosphorus', scenario_name)[1][:,:,31].sum(axis=1).mean()*(1-0.8812)/1000   # MT/yr # trapping coefficient estimated from SWAT data
+    P_total_outlet = loading_outlet_USRW('phosphorus', scenario_name, tech_wwt)[:,:,33].sum(axis=1).mean()/1000  # MT/yr
+    P_instream_store = P_nonpoint+P_point - P_total_outlet - P_reservoir   # MT/yr, 7% P are deposited 
+    
+    return P_nonpoint, P_point, P_reservoir, P_instream_store, P_total_outlet, struvite
+
+def get_P_biosolid(tech_wwt):
+    if tech_wwt =='AS':
+        P_in = 94.4; P_crop = 52.9; P_riverine = 1.1; P_soil = 40.4
+    elif tech_wwt =='ASCP':
+        P_in = 661.5; P_crop = 53.3; P_riverine = 3.3; P_soil = 604.9
+    elif tech_wwt =='EBPR_basic':
+        P_in = 592.0; P_crop = 54.0; P_riverine = 3.0; P_soil = 535.0
+    elif tech_wwt =='EBPR_acetate':
+        P_in = 626.4; P_crop = 54.3; P_riverine = 3.2; P_soil = 568.9        
+    elif tech_wwt =='EBPR_StR':
+        P_in = 209.1; P_crop = 53.4; P_riverine = 1.9; P_soil = 153.8
+    return P_in, P_crop, P_riverine, P_soil
+
+
 
 '''***************************** Performance metrics **************************************'''
 def pbias(obs, sim):

@@ -110,6 +110,29 @@ class Grain(object):
             rP = [rP_phytin, rp_P_complex]
         return rP
     
+    def get_P_flow(self):
+        '''return a list of P flow in products'''
+        p_in = self.plant_capacity*10**6*0.85*0.26/100  # MT/yr
+
+        product = self.get_product()
+        rP = self.get_rP()[-1]*0.3/1000 #26.2% P in P complex
+        if self.plant_type == 1 and self.tech_GP==1:
+            p_product = product[1]*1.2/100  #1.2% CGF without P recovery
+            p_other = p_in - p_product - rP
+        elif self.plant_type == 1 and self.tech_GP==2:
+            p_product = product[1]*0.25/100 #0.25% CGF with P recovery
+            p_other = p_in - p_product - rP
+        elif self.plant_type == 2 and self.tech_GP==1:
+            p_product = product[0]*0.90/100 #0.9% in DDGS without P recovery
+            p_other = p_in - p_product - rP
+        elif self.plant_type == 2 and self.tech_GP==2:
+            p_product = product[0]*0.32/100 #0.32% in DDGS with P recovery
+            p_other = p_in - p_product - rP
+        if p_other < 0:
+            p_other =0
+        return [p_in, p_product, p_other, rP]
+    
+    
     def get_cost(self, feedstock_index=1.0, chem_index=1.0, utility_index=1.0):
         '''
         return a list: gross operating cost ($/year): sum of total raw materials, utilities, labor, facility dependent cost.

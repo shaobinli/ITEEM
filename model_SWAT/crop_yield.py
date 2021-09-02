@@ -71,10 +71,10 @@ def get_yield_crop(crop_name, landuse_matrix):
     return a tuple: 
     crop_production (kg): size= (year, subwatershed, BMP)
     crop_production2 (kg): size = (year, subwatershed)
-    total_area ()
+    total_area (ha): size = (year, subwatershed, BMP)
     '''
-    df_corn = pd.read_excel('./model_Economics/Economics.xlsx', sheet_name='Crop_corn')
-    # df_soybean = pd.read_excel('./model_Economics/Economics.xlsx', sheet_name='Crop_soybean')
+    df_corn = pd.read_excel(r'C:\ITEEM\Submodel_Economics\Economics.xlsx', sheet_name='Crop_corn')
+    # df_soybean = pd.read_excel(r'C:\ITEEM\Submodel_Economics\Economics.xlsx', sheet_name='Crop_soybean')
     alpha = df_corn.iloc[:,7]
     # crop_name = 'soybean'
     crop = response_mat_crop(crop_name)                    #size = (year, subwatershed, bmp)    
@@ -112,18 +112,19 @@ def get_yield_crop(crop_name, landuse_matrix):
         # crop_production[i,:,:] = np.multiply(bmp_yield, total_area[i,:,:])   #(16,45,56)
         crop_production[i,:,:] = np.multiply(crop[i,:,:], total_area[i,:,:])
     if crop_name == 'switchgrass':
-        landuse_matrix[:,55]
+        # landuse_matrix[:,55]
         ag_area = basic_landuse()[1]
         sg_area = np.multiply(landuse_matrix[:,55], ag_area.T)
         crop_production[:,:,55] = np.multiply(crop[:,:,55], sg_area)
+        # total_area = sg_area.sum()  # ha, (1,45)
     crop_production2 = crop_production.sum(axis=2)
     # crop_production3 = crop_production2.sum(axis=1).mean()
     return crop_production, crop_production2, total_area
 
 # landuse_matrix = np.zeros((45,62))
-# landuse_matrix[:,1] = 1
-# landuse_matrix[:,55] = 1
-# soy_yield = get_yield_crop('soybean', landuse_matrix)[1].sum()
+# landuse_matrix[:,37] = 0.75
+# landuse_matrix[:,55] = 0.25
+# soy_yield = get_yield_crop('switchgrass', landuse_matrix)
 # sg_yield = get_yield_crop('switchgrass', landuse_matrix)[1].sum()
 # corn_yield = get_yield_crop('corn', landuse_matrix)[1].sum(axis=1)
 # corn_production = get_yield_crop('soybean', 'BMP00')[1]
@@ -202,30 +203,36 @@ def get_crop_cost(crop_name, landuse_matrix):
 # crop_soybean = get_crop_cost('soybean','BMP01')[0].sum(axis=2)
 
 '''P content'''    
-def get_P_corn(crop_name, landuse_matrix):
+def get_P_crop(landuse_matrix):
     '''return P content of corn in Metric ton/yr'''
-    # scenario_name = 'BMP00'
-    corn = get_yield_crop('corn', landuse_matrix)[1].sum(axis=1).mean()
-    P_corn_self = corn*0.85*0.26/100/1000
-    P_corn_import = (8.1*0.85*10**9 - corn)*0.26/100/1000
-    return P_corn_self, P_corn_import
+    corn = get_yield_crop('corn', landuse_matrix)[1].sum(axis=1).mean()/1000 # MT/yr
+    P_corn_self = corn*0.85*0.26/100  # MT/yr, 0.26% P in corn, dry basis
+    P_corn_import = 17966 - P_corn_self  # MT/yr, 17966 MT is the fixed total P in corn
+    
+    soybean = get_yield_crop('soybean', landuse_matrix)[1].sum(axis=1).mean()/1000    
+    P_soybean = soybean*0.85*0.41/100  #0.41% P in soybean, dry basis
+    
+    sg = get_yield_crop('switchgrass', landuse_matrix)[1].sum(axis=1).mean()/1000
+    P_sg = sg*0.85*0.1/100  #0.1% P in switchgrass, assumed    
+    return P_corn_self, P_corn_import, P_soybean, P_sg
 
-# get_P_corn('corn', 'BMP00')
 
 def get_P_fertilizer(crop_name, landuse_matrix):
     '''return P content of fertilizer in Metric ton/yr'''
-    total_area = get_yield_crop('corn', landuse_matrix)[2].mean(axis=0).sum(axis=0)  #(16,45,56)
-    total_area.sum()
+    total_area = get_yield_crop('corn', landuse_matrix)[2].mean(axis=0).sum(axis=0)  # (16,45,62)
     bmp_P_baseline = [1 for i in range(19)]
     bmp_P_15 = [0.85 for i in range(18)]
     bmp_P_30 = [0.7 for i in range(18)]
-    bmp_P_0 = [0]
+    bmp_P_0 = [55/207]
+    bmp_P_biosolid = [0]*6
+    
     bmp_P = []
-    bmp_P = bmp_P_baseline + bmp_P_15 + bmp_P_30 + bmp_P_0
-    # bmp_P[1] = 0.5
-    # corn[1] = 100
+    bmp_P = bmp_P_baseline + bmp_P_15 + bmp_P_30 + bmp_P_0 + bmp_P_biosolid
     P_fertilizer = total_area*bmp_P*207*0.2/1000   # 207 kg/ha DAP, 20% P in DAP 
     return P_fertilizer.sum()
 
-# get_P_fertilizer('corn', 'BMP50')
+# landuse_matrix = np.zeros((45,62))
+# landuse_matrix[:,1] = 0.5
+# landuse_matrix[:,55] = 0.5
+# P_fertilizer = get_P_fertilizer('corn', landuse_matrix)
     
