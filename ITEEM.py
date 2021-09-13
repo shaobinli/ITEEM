@@ -353,8 +353,7 @@ class ITEEM(object):
         output_all = [N_outlet, P_outlet, sediment_outlet,streamflow_outlet,
                          energy_dwt, energy_grain, energy_wwt.mean(), biomass,
                          cost_dwt, cost_wwt, profit_crop, profit_GP, wtp, system_net_benefit,
-                         rP_P_complex + rP_amount, corn, soybean
-                         ]
+                         rP_P_complex + rP_amount, corn, soybean]
         return environment, food, economics, energy, output_all
         
 # start = time.time()
