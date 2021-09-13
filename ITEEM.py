@@ -238,6 +238,18 @@ class ITEEM(object):
                            P_total_outlet, P_reservoir, P_instream_store,
                            P_corn_self+P_crop_biosolid
                            ]
+            
+            source = ['Imported corn', 'Fertilizer', 'Fertilizer', 'Fertilizer', 'Fertilizer', 'Fertilizer',  
+                      'Manure', 'Manure', 'Manure', 'Wastewater', 'Wastewater', 'Wastewater', 'Wastewater', 'Corn biorefinery', 'Corn biorefinery',
+                      'In-stream load', 'In-stream load', 'In-stream load', 'Corn (local)'
+                      ]
+            target = ['Corn biorefineries', 'In-stream load', 'Corn (local)', 'Soybean', 'Soil',
+                      'Biomass', 'In-stream load', 'Corn silage', 'Soil', 'In-stream load', 
+                      'Corn (local)', 'recovered P', 'Soil', 'Products from CBs', 'recovered P', 
+                      'Riverine export', 'Reservoir trapping', 'In-stream storage',
+                      'Corn biorefineries'
+                      ]
+            
         elif P_soil_fertilizer < 0:
             output_list = [P_corn_import, P_nonpoint, P_corn_self+P_soil_fertilizer*0.65, P_soybean+P_soil_fertilizer*0.35, 
                            P_sg, P_manure_runoff, P_corn_silage, 
@@ -247,8 +259,18 @@ class ITEEM(object):
                            P_corn_self+P_crop_biosolid,
                            P_soil_fertilizer*-0.65, P_soil_fertilizer*-0.35
                            ]
+            source = ['Imported corn', 'Fertilizer', 'Fertilizer', 'Fertilizer', 'Fertilizer', 'Manure', 'Manure',
+                      'Wastewater', 'Wastewater', 'Wastewater', 'Wastewater', 'Corn biorefinery', 'Corn biorefinery',
+                      'In-stream load', 'In-stream load', 'In-stream load', 'Corn (local)', 'Soil', 'Soil'
+                      ]
+            target = ['Corn biorefineries', 'In-stream load', 'Corn (local)', 'Soybean', 'Biomass',
+                      'In-stream load', 'Corn silage', 'In-stream load', 'Corn (local)', 
+                      'recovered P', 'Biosolid', 'Products from CBs', 'recovered P', 
+                      'Riverine export', 'Reservoir trapping', 'In-stream storage',
+                      'Corn biorefineries', 'Corn (local)', 'Soybean'
+                      ]
 
-        return P_in_list, P_intermediate_list, P_out_list_adj, P_soil_fertilizer, output_list
+        return P_in_list, P_intermediate_list, P_out_list_adj, source, target, P_soil_fertilizer, output_list
     
     
     def run_ITEEM(self, sw=33, r=0.07, n_wwt=40, nutrient_index=1.0, flow_index=1.0, chem_index=1.0, rP_index=1.0, 

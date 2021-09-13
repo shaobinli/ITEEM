@@ -568,13 +568,13 @@ def get_P_riverine(scenario_name, tech_wwt):
     P_point = 582.4 # MT/yr
     struvite = 0
     if tech_wwt == 'ASCP':
-        loading_day_tp = scipy.io.loadmat('C:\ITEEM\Submodel_WWT\SDD_analysis\ASCP_tp_matrix.mat')['out']
+        loading_day_tp = scipy.io.loadmat('./model_WWT/SDD_analysis/ASCP_tp_matrix.mat')['out']
     elif tech_wwt == 'EBPR_basic':
-        loading_day_tp = scipy.io.loadmat(r'C:\ITEEM\Submodel_WWT\SDD_analysis\EBPR_basic_tp_matrix.mat')['out']        
+        loading_day_tp = scipy.io.loadmat('./model_WWT/SDD_analysis/EBPR_basic_tp_matrix.mat')['out']        
     elif tech_wwt == 'EBPR_acetate':
-        loading_day_tp = scipy.io.loadmat('C:\ITEEM\Submodel_WWT\SDD_analysis\EBPR_acetate_tp_matrix.mat')['out']
+        loading_day_tp = scipy.io.loadmat('./model_WWT/SDD_analysis/EBPR_acetate_tp_matrix.mat')['out']
     elif tech_wwt == 'EBPR_StR':
-        loading_day_tp = scipy.io.loadmat('C:\ITEEM\Submodel_WWT\SDD_analysis\EBPR_StR_tp_matrix.mat')['out']
+        loading_day_tp = scipy.io.loadmat('./model_WWT/SDD_analysis/EBPR_StR_tp_matrix.mat')['out']
         struvite = 450 # kg/year, TP in pellect collection (mixtured of struvite and others), calculated from Aryan.
     
     if tech_wwt != 'AS':
@@ -634,87 +634,3 @@ def nse(obs, sim):
     sim_flat = sim.flatten()
     nse0 = 1 - sum((obs_flat - sim_flat)**2)/sum((obs_flat-obs_ave)**2) 
     return nse0
-
-
-'''***************************** Plot **************************************'''
-def dynamic_plot(name, time_period, sw):
-    # name = 'streamflow'
-    # time_period = 'cumulative'
-    test = loading_outlet_USRW(name, 'BMP00')
-    test_1D = test[:,:,sw]
-    test_1D_cum = np.cumsum(test_1D)
-    test_annual = test_1D.sum(axis=1)
-    
-    test1 = loading_outlet_USRW(name, 'BMP01', 'ASCP')
-    test1_1D = test1[:,:,sw]
-    test1_1D_cum = np.cumsum(test1_1D)
-    test1_annual = test1_1D.sum(axis=1)
-    
-    test2 = loading_outlet_USRW(name, 'BMP23', 'ASCP')
-    test2_1D = test2[:,:,sw]
-    test2_1D_cum = np.cumsum(test2_1D)
-    test2_annual = test2_1D.sum(axis=1)
-    
-    test3 = loading_outlet_USRW(name, 'BMP50', 'EBPR')
-    test3_1D = test3[:,:,sw]
-    test3_1D_cum = np.cumsum(test3_1D)
-    test3_annual = test3_1D.sum(axis=1)
-
-    fig = plt.figure(figsize=(6.5,5))
-    if time_period == 'monthly':
-        plt.plot(test_1D.flatten(), color='blue', label='Baseline', linewidth=3)
-        plt.plot(test1_1D.flatten(), color='purple', label='S1(BMP1)', linewidth=2.5)
-        plt.plot(test2_1D.flatten(), color='green', label='S2(BMP23)', linewidth=2)
-        plt.plot(test3_1D.flatten(), color='red', label='S3(BMP50)', linewidth=1.5)
-        
-    elif time_period == 'cumulative':
-        plt.plot(np.cumsum(test_1D), color='blue', label='Baseline', linewidth=3)
-        plt.plot(np.cumsum(test1_1D), color='purple', label='S1(BMP1)', linewidth=2.5)
-        plt.plot(np.cumsum(test2_1D), color='green', label='S2(BMP23)', linewidth=2)
-        plt.plot(np.cumsum(test3_1D), color='red', label='S3(BMP50)', linewidth=1.5)
-        
-    elif time_period == 'annual' and name == 'nitrate':
-        plt.plot(test_annual, color='blue', marker='o', label='Baseline', linewidth=3)
-        # 7240 Mg/yr for Nitrate-N as 1980-1996 baseline
-        plt.plot(7240*1000*0.85, color='blue', marker='o', linestyle='dashdot', label='15% Reductional Goal by 2025', alpha=.5, linewidth=2)
-        plt.plot(7240*1000*0.55, color='blue', marker='o', linestyle=':', label='45% Reductional Goal by 2045', alpha=.5, linewidth=2)
-        plt.plot(test1_annual, color='purple', marker='o', label='S1(BMP1)', linewidth=2.5)
-        plt.plot(test2_annual, color='green', marker='o', label='S2(BMP23)', linewidth=2)
-        plt.plot(test3_annual, color='red', marker='o', label='S3(BMP50)', linewidth=1.5)
-    
-    elif time_period == 'annual' and name == 'phosphorus':
-        plt.plot(test_annual, color='blue', marker='o', label='Baseline', linewidth=3)
-        # 324 Mg/yr for TP as 1980-1996 baseline
-        plt.plot(324*1000*0.75, color='blue', marker='o', linestyle='dashdot', label='25% Reductional Goal by 2025', alpha=.5, linewidth=2)
-        plt.plot(324*1000*0.55, color='blue', marker='o', linestyle=':', label='45% Reductional Goal by 2045', alpha=.5, linewidth=2)
-        plt.plot(test1_annual, color='purple', marker='o', label='S1(BMP1)', linewidth=2.5)
-        plt.plot(test2_annual, color='green', marker='o', label='S2(BMP23)', linewidth=2)
-        plt.plot(test3_annual, color='red', marker='o', label='S3(BMP50)', linewidth=1.5)
-    
-    if name == 'streamflow':
-        plt.ylabel(name +' at outlet (m3)', fontsize=14)
-    elif name =='sediment':
-        plt.ylabel(name +' loading at outlet (ton)', fontsize=14)
-    else:
-        plt.ylabel(name +' loading at outlet (kg)', fontsize=14)
-            
-    plt.xlabel('Time (2003-2018)', fontsize=14)
-    if time_period == 'monthly' or time_period == 'cumulative':
-        labels = [2003] + [str(i)[-2:] for i in range(2004,2020)]
-        plt.xticks(np.arange(0, 192+1, 12), labels)
-    else:
-        labels = [2003] + [str(i)[-2:] for i in range(2004,2019)]
-        plt.xticks(np.arange(0,16+1), labels)
-    # ax.set_xticklabels([i for i in range(2003,2019)])
-    # plt.yticks(np.arange(0, 25, 2))
-    plt.ticklabel_format(axis='y', style='sci', scilimits=(0,0))
-    # plt.legend(loc='upper left', fontsize=12 )
-    plt.legend(fontsize=12, loc='center left', bbox_to_anchor=(0.03, 1.2), ncol=2)
-    plt.tight_layout()
-    # plt.savefig('./ITEEM_figures/July//'+name+'_'+ time_period + str(sw) +'_loading.tif', dpi=150)
-    plt.show()
-    return
-
-# start = time.time()
-# dynamic_plot('nitrate', 'monthly'))
-# dynamic_plot('sediment', 'annual')
