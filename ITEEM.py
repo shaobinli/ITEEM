@@ -250,6 +250,7 @@ class ITEEM(object):
                       'Corn biorefineries'
                       ]
             
+
         elif P_soil_fertilizer < 0:
             output_list = [P_corn_import, P_nonpoint, P_corn_self+P_soil_fertilizer*0.65, P_soybean+P_soil_fertilizer*0.35, 
                            P_sg, P_manure_runoff, P_corn_silage, 
@@ -270,7 +271,12 @@ class ITEEM(object):
                       'Corn biorefineries', 'Corn (local)', 'Soybean'
                       ]
 
-        return P_in_list, P_intermediate_list, P_out_list_adj, source, target, P_soil_fertilizer, output_list
+        output_list2 = []
+        for i in range(len(source)):
+            single_node = [source[i], target[i], output_list[i]]
+            output_list2.append(single_node)
+                
+        return P_in_list, P_intermediate_list, P_out_list_adj, source, target, P_soil_fertilizer, output_list, output_list2
     
     
     def run_ITEEM(self, sw=33, r=0.07, n_wwt=40, nutrient_index=1.0, flow_index=1.0, chem_index=1.0, rP_index=1.0, 
@@ -357,10 +363,10 @@ class ITEEM(object):
         return environment, food, economics, energy, output_all
         
 # start = time.time()
-# landuse_matrix_baseline = np.zeros((45,62))
-# landuse_matrix_baseline[:,55] = 0.25
-# landuse_matrix_baseline[:,37] = 0.75
-# baseline = ITEEM(landuse_matrix_baseline, tech_wwt='AS', limit_N=10.0, tech_GP1=1, tech_GP2=1, tech_GP3=1)
-# output = baseline.get_P_flow()
+landuse_matrix_baseline = np.zeros((45,62))
+landuse_matrix_baseline[:,55] = 0.25
+landuse_matrix_baseline[:,37] = 0.75
+baseline = ITEEM(landuse_matrix_baseline, tech_wwt='AS', limit_N=10.0, tech_GP1=1, tech_GP2=1, tech_GP3=1)
+output = baseline.get_P_flow()
 # end = time.time()
 # print('Simulation time is: ', end - start)
