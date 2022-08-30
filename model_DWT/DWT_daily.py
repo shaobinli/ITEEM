@@ -16,7 +16,7 @@ import numpy_financial as npf
 from calendar import monthrange
 from model_DWT.SWAT_originalRM_daily import loading_outlet_originalRM 
 from model_SWAT.SWAT_functions import sediment_instream, loading_outlet_USRW
-from model_Economics.discount_functions import annuity_factor, pv, real_dr, cost_inflation
+from model_Economics.discount_functions import annuity_factor, pv, real_dr, cost_inflation   
 
 # set up global variable
 df_nitrate_yield = pd.read_csv('./model_SWAT/response_matrix_csv/yield_nitrate.csv')
