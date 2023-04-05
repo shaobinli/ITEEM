@@ -35,7 +35,7 @@ for i in range(1,11):
 
 class ITEEM_problem(Problem):
     def __init__(self, **kwargs):
-        super().__init__(n_var=n_var, n_obj=5, n_constr=2, elementwise_evaluation=True, **kwargs)
+        super().__init__(n_var=n_var, n_obj=4, n_constr=2, elementwise_evaluation=True, **kwargs)
         self.xl = x_lower
         self.xu = x_upper
                
@@ -84,15 +84,15 @@ class ITEEM_problem(Problem):
                         tech_GP2=1, tech_GP3=1)
         
         output = solution.run_ITEEM_opt(sg_price=0.05)
-        f1 = output[0]
-        f2 = output[1]
-        f3 = output[2]
-        f4 = output[3]
-        f5 = output[4]
+        f1 = output[0] # obj_water_quality
+        f2 = output[1] # obj_food
+        f3 = output[2] # obj_eco
+        f4 = output[4] # obj_rP
+
         g1 = (output[5] - 774310*0.85)/(7*(10**6))   # 10% reduction for P
         g2 =  (output[6] - 7927670*0.85)/(7*(10**6)) # 15% reduction
         
-        out['F'] = anp.column_stack([f1, f2, f3, f4, f5])
+        out['F'] = anp.column_stack([f1, f2, f3, f4])
         out['G'] = anp.column_stack([g1, g2])
         
         
